@@ -4,12 +4,12 @@ from torchsta.torchsummary import summary
 from torchvision import models
 
 # torchvision: 
-#    AlexNet, VGG-11, VGG-13, VGG-16, VGG-19, VGG-11 BN, VGG-13 BN, VGG-16 BN,
-#   VGG-19 BN, ResNet-18, ResNet-34, ResNet-50, ResNet-101, ResNet-152, 
-#   SqueezeNet 1.0, SqueezeNet 1.1, Densenet-121, Densenet-169, Densenet-201
-#   Densenet-161, Inception v3, GoogleNet, ShuffleNet V2, MobileNet V2
-#   ResNeXt-50-32x4d, ResNeXt-101-32x8d, Wide ResNet-50-2, Wide ResNet-101-2
-#   MNASNet 1.0
+#    alexnet, vgg11, vgg13, vgg16, vgg19, vgg11_bn, vgg_13 bn, vgg16_bn,
+#   vgg19_bn, resnet18, resnet34, resnet50, resnet101, resnet152, 
+#   SqueezeNet1_0, SqueezeNet1_1, densenet_121, densenet_169, densenet_201
+#   densenet_161, inception_v3, googlenet, shufflenet_V2_x'n'_'n', mobileNet_v2
+#   resnext_50_32x4d, resnext_101_32x8d, wide_resNet_50_2, wide_resnet_101_2
+#   MNASNet'n'_'n'
 # Transfomer: 
 #    bert-base-cased
 # Recomendation:
@@ -17,7 +17,7 @@ from torchvision import models
 
 
 # model to be loaded
-nnname = "bert-base-cased"
+nnname = "resnet18"#"bert-base-cased"
 
 isconv = True
 depth = 4

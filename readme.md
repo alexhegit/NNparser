@@ -12,6 +12,8 @@ Note:
 
 For transformer models, [Huggingface's Transformer package](https://github.com/huggingface/transformers) should be installed.
 
+For DIEN/NCF models, packages from [tensorflow/models](https://github.com/tensorflow/models) should be included. A easier solution is to clone the codes to a folder, and add the folder into PYTHONPATH
+
 
 
 ### Tensorflow version: keras2csv
