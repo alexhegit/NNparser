@@ -13,7 +13,7 @@ import numpy as np
 import csv
 
 # model tobe loaded
-nnname = 'ResNet50'
+nnname = 'din'
 
 # csv file to be exported
 paracsv = './/outputs//tf//'+nnname+'.csv'
@@ -60,13 +60,13 @@ if isconv:
     dim =3 # 4 dim tensor: BHWC, no B
     linput=['I0_'+str(i) for i in range(dim)] + ['I1_'+str(i) for i in range(dim)]
     loutput=['O_'+str(i) for i in range(dim)]
-    lweights = ['K_1','K_2','S_1','S_2','p_1','p_2','input','output','weight']
+    lweights = ['K_1','K_2','S_1','S_2','p_1','p_2','input','output','weight','ops']
     heads = linput + loutput + lweights + ['Misc']
 else:
     dim=2 # 3 dim: B+ 1XW vector,no B
     linput=['I0_'+str(i) for i in range(dim)] + ['I1_'+str(i) for i in range(dim)]
     loutput=['O_'+str(i) for i in range(dim)] 
-    lweights = ['input','output','weight']
+    lweights = ['input','output','weight','ops']
     heads = linput + loutput + lweights + ['Misc']
 paralist.append(['layer','type'] + heads)
 
@@ -81,10 +81,11 @@ for x in model.layers: #model.layers[::-1]
     datai=''
     datao=''
     dataw=''
+    macs=''
     ltype = str(type(x)).split(".")[-1].split("'")[0]
     # if x.name == 'attention':
     #     print(x.name)
-    # print(x.name)
+    #print(x.name)
     conf = x.get_config()    
     
     # input tensors
@@ -125,7 +126,6 @@ for x in model.layers: #model.layers[::-1]
                 extin = extin + str(tmp) + '\n'
             extin = extin[:-1]
                 
-
     # output: 
     if not isinstance(x.output, list): 
         # single output：2d vector or 4d tensor: batch x oh x ow x oc
@@ -137,11 +137,11 @@ for x in model.layers: #model.layers[::-1]
                 None
         for item in out:
             if isinstance(item,int):
-                datao=datao*item 
-    
+                datao=datao*item     
     else:
         print(conf['name'] + ' has ' +str(len(x.output))+' outputs')
-        
+    
+    xtype=str(type(x))
     # Conv2d, MaxPooling2D, 
     if isinstance(x, keras.layers.Conv2D):
         # kernel size
@@ -157,8 +157,38 @@ for x in model.layers: #model.layers[::-1]
         elif conf['padding']=='same':
             ph=kh//2
             pw=kw//2
-        dataw=inp0[2]*kh*kw*out[2]
+        weights=x.get_weights()
+        dataw=0
+        for item in weights:
+            dataw += np.prod(item.shape)
+        macs=kh*kw*inp0[2]*np.prod(out)
     
+    if xtype.find('BatchNormalization')>0:
+       weights=x.get_weights()
+       dataw=0
+       for item in weights:
+            dataw += np.prod(item.shape)
+       macs = np.prod(out)*(1+2)#1 add 2mac
+ 
+    if isinstance(x,keras.layers.Activation):
+       weights=x.get_weights()
+       if len(weights)>0: 
+            dataw=0
+            for item in weights:
+                dataw += np.prod(item.shape)
+       macs = datao  #activation functions
+       
+    if isinstance(x,keras.layers.Add):
+       macs = datao # add ->towrensor
+
+    if isinstance(x,keras.layers.Dense):
+       weights=x.get_weights()
+       if len(weights)>0: 
+            dataw=0
+            for item in weights:
+                dataw += np.prod(item.shape)
+       macs = datai*datao#1 add 2mac
+        
     if isinstance(x, keras.layers.DepthwiseConv2D):
         # kernel size
         kh = conf['kernel_size'][0]
@@ -174,6 +204,7 @@ for x in model.layers: #model.layers[::-1]
             ph=kh//2
             pw=kw//2
         dataw=inp0[2]*kh*kw*1
+        macs=kh*kw*inp0[2]*np.prod(out)
            
     if isinstance(x, keras.layers.MaxPooling2D): # ignore GlobalAveragePooling2D
         # kernel size
@@ -189,8 +220,21 @@ for x in model.layers: #model.layers[::-1]
         elif conf['padding']=='same':
             ph=kh//2
             pw=kw//2
+        weights=x.get_weights()
+        if len(weights)>0: 
+            dataw=0
+            for item in weights:
+                dataw += np.prod(item.shape)
+        macs=datao*(kh*kw-1) #max op
     
-      
+    if isinstance(x,keras.layers.GlobalAveragePooling2D):
+        weights=x.get_weights()
+        if len(weights)>0: 
+            dataw=0
+            for item in weights:
+                dataw += np.prod(item.shape)
+        macs=datao*(inp0[0]*inp0[1]-1) #add op
+        
     if isinstance(x, keras.layers.Embedding):
         # dim 3:
         inp0[2] = x.input_dim 
@@ -199,10 +243,10 @@ for x in model.layers: #model.layers[::-1]
     #     print('')
         
     if isconv:
-        new_row = [x.name,ltype]+ inp0+inp1+out+[kh,kw,sh,sw,ph,pw,datai,datao,dataw,extin]
+        new_row = [x.name,ltype]+ inp0+inp1+out+[kh,kw,sh,sw,ph,pw,datai,datao,dataw,macs,extin]
         paralist.append(new_row)
     else:
-        new_row = [x.name,ltype]+ inp0[:dim]+inp1[:dim]+out[:dim]+[datai,datao,dataw,extin]
+        new_row = [x.name,ltype]+ inp0[:dim]+inp1[:dim]+out[:dim]+[datai,datao,dataw,macs,extin]
         paralist.append(new_row)
         #paralist.append([x.name,ltype,ih0,iw0,ih1,iw1,oh,ow,oc,extin])
 
