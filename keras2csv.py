@@ -97,7 +97,7 @@ for x in model.layers: #model.layers[::-1]
                 for ind in range(i-1):
                     if inp0[ind] is not None:
                         datai0=datai0*inp0[ind]
-            break
+				break
         datai=str(datai0)
     elif len(x.input)>1:       # 2 inputs
         datai0=1
