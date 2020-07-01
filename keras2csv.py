@@ -9,7 +9,7 @@
 # models in tfhub
 # more outputs by formula?
 import tensorflow.keras as keras
-
+import numpy as np
 import csv
 
 # model tobe loaded
@@ -94,31 +94,31 @@ for x in model.layers: #model.layers[::-1]
             try:
                 inp0[i-1]=x.input.shape[i]                
             except IndexError:
-                for ind in range(i-1):
-                    if inp0[ind] is not None:
-                        datai0=datai0*inp0[ind]
-				break
-        datai=str(datai0)
+                None
+        for item in inp0:
+            if isinstance(item,int):
+                datai0=datai0*item            
+        datai=(datai0)
     elif len(x.input)>1:       # 2 inputs
         datai0=1
         for i in range(1,4,1):            
             try:
                 inp0[i-1]=x.input[0].shape[i]
             except IndexError:
-                for ind in range(i-1):
-                    if inp0[ind] is not None:
-                        datai0=datai0*inp0[ind]
-                break
+                None
+        for item in inp0:
+            if isinstance(item,int):
+                datai0=datai0*item 
         datai1=1
         for i in range(1,4,1):
             try:
                 inp1[i-1]=x.input[1].shape[i]
             except IndexError:
-                for ind in range(i-1):
-                    if inp1[ind] is not None:
-                        datai1=datai1*inp1[ind]
-                break
-        datai=str(datai0+datai1)
+                None
+        for item in inp1:
+            if isinstance(item,int):
+                datai1=datai1*item 
+        datai=(datai0+datai1)
         if len(x.input)>2:
             for inp in x.input_shape[2:]:
                 tmp = inp[1:]
@@ -134,10 +134,11 @@ for x in model.layers: #model.layers[::-1]
             try:
                 out[i-1]=x.output.shape[i]
             except IndexError:
-                for ind in range(i-1):
-                    if out[ind] is not None:
-                        datao=datao*out[ind]
-                break
+                None
+        for item in out:
+            if isinstance(item,int):
+                datao=datao*item 
+    
     else:
         print(conf['name'] + ' has ' +str(len(x.output))+' outputs')
         
