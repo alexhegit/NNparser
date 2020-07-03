@@ -13,7 +13,7 @@ import numpy as np
 import csv
 
 # model tobe loaded
-nnname = 'bert'
+nnname = 'ncf'
 
 # csv file to be exported
 paracsv = './/outputs//tf//'+nnname+'.csv'
@@ -79,15 +79,22 @@ if isconv:
     dim =3 # 4 dim tensor: BHWC, no B
     linput=['I0_'+str(i) for i in range(dim)] + ['I1_'+str(i) for i in range(dim)]
     loutput=['O_'+str(i) for i in range(dim)]
-    lweights = ['K_1','K_2','S_1','S_2','p_1','p_2','input','output','weight','gemm','vect']
-    heads = linput + loutput + lweights + ['Misc']
+    lweights = ['K_1','K_2','S_1','S_2','p_1','p_2']
+    largs =['size','','','ops','','']
+    row0 = ['layer','type'] +linput + loutput + lweights + largs+['Misc']
+    largs =['input','output','weight','gemm','vect','acti']
+    row1 = ['','']+['']*len(linput + loutput + lweights) + largs +['']
 else:
     dim=2 # 3 dim: B+ 1XW vector,no B
     linput=['I0_'+str(i) for i in range(dim)] + ['I1_'+str(i) for i in range(dim)]
-    loutput=['O_'+str(i) for i in range(dim)] 
-    lweights = ['input','output','weight','gemm','vect']
-    heads = linput + loutput + lweights + ['Misc']
-paralist.append(['layer','type'] + heads)
+    loutput=['O_'+str(i) for i in range(dim)]
+    lweights = []
+    largs =['size','','','ops','','']
+    row0 = ['layer','type'] +linput + loutput + lweights + largs+['Misc']
+    largs =['input','output','weight','gemm','vect','acti']
+    row1 = ['','']+['']*len(linput + loutput + lweights) + largs +['']
+paralist.append(row0)
+paralist.append(row1)
 
 for x in model.layers: #model.layers[::-1]
     out=['']*3 # no batch, hxwxc
@@ -97,14 +104,11 @@ for x in model.layers: #model.layers[::-1]
     sh = ''; sw=''
     ph = ''; pw=''
     extin=''
-    datai=''
-    datao=''
-    dataw=''
-    gemm=''
-    vect=''
+    datai=''; datao=''; dataw=''
+    gemm=''; vect='' ; acti =''
     ltype = str(type(x)).split(".")[-1].split("'")[0]
-    # if x.name == 'attention':
-    #     print(x.name)
+    if x.name=='NSP-Dense':
+        print(x.name)
     #print(x.name)
     conf = x.get_config()    
     
@@ -192,6 +196,73 @@ for x in model.layers: #model.layers[::-1]
             dataw += np.prod(item.shape)
                 
     xtype=str(type(x))
+    if ltype:
+        if ltype=='BatchNormalization': # BN
+            vect = datao*2 #1 elem* 1elem+
+        if ltype=='Add': #add layer
+            vect = datao # output tensor size
+        if ltype=='LayerNormalization': #add layer
+            acti = datao # output tensor size
+        if ltype=='MultiHeadAttention': #attentio layer
+            head = x.head_num
+            seqlen,emblen = inp0[:2]
+            keylen =emblen//head # feature_dim
+            gemm=0; vect=0; acti=0
+            #one head of one sentence
+            ub = 1 if x.use_bias else 0
+            # Q*K'= X*W_q*W_k'*X'
+            QS = seqlen*emblen*keylen + seqlen*keylen*ub # size: seqlen*keylen
+            KS = seqlen*emblen*keylen + seqlen*keylen*ub # size: seqlen*keylen
+            gemm += QS+KS + seqlen*keylen*seqlen
+            # / sqrt(kenlen)
+            vect += seqlen*seqlen
+            # softmax
+            acti += seqlen*seqlen 
+            # f(Q*K') * x*W_v, Wv emblen*keylen (same dim on W_q,W_k,W_v)
+            gemm += seqlen*seqlen*emblen+seqlen*emblen*keylen 
+            
+            # multihead
+            # concate
+            keylen=keylen*head
+            gemm = gemm*head
+            vect = vect*head
+            acti = acti*head
+            # x*W_o
+            gemm += seqlen*keylen*emblen
+                      
+            # outputs: features of a sentence
+            datao= datao*seqlen
+            
+        if ltype=='LayerNormalization': #attentio layer
+            seqlen,emblen = inp0[:2]
+            vect=0; acti=0
+            #  along last dim, emb dim
+            # mean
+            vect += (seqlen-1)
+            # var:sum(x*x-mx)
+            vect += (seqlen*3-1)
+            # std: sqrt(var+epsi)
+            vect += (seqlen)
+            acti += (seqlen)
+            # output:( x-mx)/std
+            vect += (seqlen*2)
+        
+        if ltype=='FeedForward': #attentio layer
+            seqlen,emblen = inp0[:2]
+            units=x.units
+            gemm=0; acti=0
+            ub = 1 if x.use_bias else 0
+            # w1x+b
+            gemm += seqlen*emblen*units +seqlen*units*ub
+            acti += seqlen*units
+            # w2x+b
+            gemm += seqlen*units*emblen +seqlen*emblen*ub
+            acti += seqlen*emblen
+        
+        if ltype=='Dense':
+            gemm = datai*datao#1 add 2mac
+            
+    
     # Conv2d, MaxPooling2D, 
     if isinstance(x, keras.layers.Conv2D):
         # kernel size
@@ -209,18 +280,9 @@ for x in model.layers: #model.layers[::-1]
             pw=kw//2
         gemm=kh*kw*inp0[2]*np.prod(out)
     
-    if xtype.find('BatchNormalization')>0:
-       vect = datao*2 #1 elem* 1elem+
- 
     if isinstance(x,keras.layers.Activation):
        acti = datao  #activation functions
-       
-    if isinstance(x,keras.layers.Add):
-       vect = datao # add ->towrensor
-
-    if isinstance(x,keras.layers.Dense):
-       gemm = datai*datao#1 add 2mac
-        
+   
     if isinstance(x, keras.layers.DepthwiseConv2D):
         # kernel size
         kh = conf['kernel_size'][0]
@@ -256,18 +318,20 @@ for x in model.layers: #model.layers[::-1]
     if isinstance(x,keras.layers.GlobalAveragePooling2D):
         vect=datao*(inp0[0]*inp0[1]-1) #add op
         
-    if isinstance(x, keras.layers.Embedding):
+    if xtype.find('Embedding')>0:
         # todo: inputdim??
-        inp0[2] = x.input_dim 
+        vocalsize = inp0[0]
+        embsize = out[0]
+        seqlen = inp0[0]
      
     # if isinstance(x, keras.layers.Lambda):
     #     print('')
         
     if isconv:
-        new_row = [x.name,ltype]+ inp0+inp1+out+[kh,kw,sh,sw,ph,pw,datai,datao,dataw,gemm,vect,extin]
+        new_row = [x.name,ltype]+ inp0+inp1+out+[kh,kw,sh,sw,ph,pw,datai,datao,dataw,gemm,vect,acti,extin]
         paralist.append(new_row)
     else:
-        new_row = [x.name,ltype]+ inp0[:dim]+inp1[:dim]+out[:dim]+[datai,datao,dataw,gemm,vect,extin]
+        new_row = [x.name,ltype]+ inp0[:dim]+inp1[:dim]+out[:dim]+[datai,datao,dataw,gemm,vect,acti,extin]
         paralist.append(new_row)
         #paralist.append([x.name,ltype,ih0,iw0,ih1,iw1,oh,ow,oc,extin])
 
