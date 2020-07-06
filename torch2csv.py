@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import torch
-from torchsta.torchsummary import summary
+from utils.torchsummary import summary
 from torchvision import models
 
 # torchvision: 
