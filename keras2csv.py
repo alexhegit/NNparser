@@ -109,8 +109,14 @@ for x in model.layers: #model.layers[::-1]
         paralist.append(new_row)
     else:
         dim=2
-        new_row = [x.name,ltype]+ inp0[:dim]+inp1[:dim]+out[:dim]+[datai,datao,dataw,gemm,vect,acti,extin]
-        paralist.append(new_row)
+        if isinstance(gemm,list): # multihead attention: tow rows
+            new_row = [x.name,ltype]+ inp0[:dim]+inp1[:dim]+out[:dim]+[datai,datao,dataw,gemm[0],vect[0],acti[0],extin]
+            paralist.append(new_row)
+            new_row = ['']*11+[gemm[1],vect[1],acti[1]]+['']
+            paralist.append(new_row)
+        else:
+            new_row = [x.name,ltype]+ inp0[:dim]+inp1[:dim]+out[:dim]+[datai,datao,dataw,gemm,vect,acti,extin]
+            paralist.append(new_row)
 
 # csv file to be exported
 paracsv = './/outputs//tf//'+nnname+'.csv'
