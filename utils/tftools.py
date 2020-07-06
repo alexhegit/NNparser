@@ -111,6 +111,13 @@ def outputgen(x,out,extin):
             datao +=dtmp
             extin += str(tmp) + ','
         extin = extin[:-1]
+    ltype = str(type(x)).split(".")[-1].split("'")[0]
+    if ltype:
+         if ltype=='MultiHeadAttention': #attentio layer
+                     # outputs: features of a sentence
+            seqlen = x.input_shape[1]
+            datao= datao*seqlen
+         
     return out,datao,extin
 
 def getweightsize(x,dataw):    
@@ -146,11 +153,13 @@ def opscomputation(x,datao,inp0):
             vect += seqlen*seqlen
             # softmax
             acti += seqlen*seqlen 
-            # f(Q*K') * x*W_v, Wv emblen*keylen (same dim on W_q,W_k,W_v)
+            # f(Q*K') * (x*W_v), Wv emblen*keylen (same dim on W_q,W_k,W_v)
             VS = seqlen*emblen*keylen + seqlen*keylen*ub # V: seqlen*keylen
             FV = seqlen*seqlen*keylen # F(QK)*V: seqlen*keylen
             gemm += VS+FV 
-            
+            gemmoh = gemm
+            vectoh = vect
+            actioh = acti
             # multihead
             # concate
             keylen=keylen*head
@@ -158,10 +167,12 @@ def opscomputation(x,datao,inp0):
             vect = vect*head
             acti = acti*head
             # x*W_o
-            gemm += seqlen*keylen*emblen
-                      
-            # outputs: features of a sentence
-            datao= datao*seqlen
+            gemm += seqlen*keylen*emblen + seqlen*emblen*ub
+            gemm = [gemmoh, gemm]
+            vect = [vectoh,vect]
+            acti = [actioh, acti]
+            
+
             
         if ltype=='LayerNormalization': #attentio layer
             seqlen,emblen = inp0[:2]
