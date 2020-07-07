@@ -50,18 +50,19 @@ def GetModel(nnname):
         isconv =False
         from keras_bert import get_base_dict, get_model, compile_model
         # Build token dictionary
-        token_dict = get_base_dict()  
-        # Build & train the model
-        model = get_model(
-            token_num=len(token_dict),
-            head_num=5,
-            transformer_num=12,
-            embed_dim=25,
-            feed_forward_dim=100,
-            seq_len=20,
-            pos_num=20,
+        token_dict = get_base_dict()
+        training = False
+        if training:
+            model = get_model(token_num=len(token_dict),
+            head_num=5, transformer_num=12, training=training,
+            embed_dim=25, feed_forward_dim=100, seq_len=20, pos_num=20,
             dropout_rate=0.05,
-        )
+            )
+        else:
+            _,_,model = get_model(token_num=len(token_dict),
+                head_num=5, transformer_num=12, training=training,
+                embed_dim=25, feed_forward_dim=100, seq_len=20, pos_num=20,
+            )
         compile_model(model)
         #model.summary()
 
@@ -79,7 +80,7 @@ for x in model.layers: #model.layers[::-1]
     datai=''; datao=''; dataw=''
     gemm=''; vect='' ; acti =''
     ltype = str(type(x)).split(".")[-1].split("'")[0]
-    # if x.name=='NSP-Dense':
+    # if x.name=='Encoder-1-FeedForward':
     #     print(x.name)
     #print(x.name)
     
@@ -108,12 +109,17 @@ for x in model.layers: #model.layers[::-1]
         new_row = [x.name,ltype]+ inp0+inp1+out+[kh,kw,sh,sw,ph,pw,datai,datao,dataw,gemm,vect,acti,extin]
         paralist.append(new_row)
     else:
+        doublerow = False
         dim=2
-        if isinstance(gemm,list): # multihead attention: tow rows
-            new_row = [x.name,ltype]+ inp0[:dim]+inp1[:dim]+out[:dim]+[datai,datao,dataw,gemm[0],vect[0],acti[0],extin]
-            paralist.append(new_row)
-            new_row = ['']*11+[gemm[1],vect[1],acti[1]]+['']
-            paralist.append(new_row)
+        if isinstance(gemm,list): 
+            if doublerow: # multihead attention: tow rows
+                new_row = [x.name,ltype]+ inp0[:dim]+inp1[:dim]+out[:dim]+[datai,datao,dataw,gemm[0],vect[0],acti[0],extin]
+                paralist.append(new_row)
+                new_row = ['']*11+[gemm[1],vect[1],acti[1]]+['']
+                paralist.append(new_row)
+            else:
+                new_row = [x.name,ltype]+ inp0[:dim]+inp1[:dim]+out[:dim]+[datai,datao,dataw,gemm[1],vect[1],acti[1],extin]
+                paralist.append(new_row)
         else:
             new_row = [x.name,ltype]+ inp0[:dim]+inp1[:dim]+out[:dim]+[datai,datao,dataw,gemm,vect,acti,extin]
             paralist.append(new_row)

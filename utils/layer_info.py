@@ -31,6 +31,9 @@ class LayerInfo:
         self.pad_size = []  #0614
         self.num_params = 0
         self.macs = 0
+        self.gemm = []
+        self.vect = []
+        self.acti = []
 
     def __repr__(self) -> str:
         return "{}: {}-{}".format(self.class_name, self.depth, self.depth_index)
@@ -87,6 +90,7 @@ class LayerInfo:
             )
 
     def calculate_num_params(self) -> None:
+        ub=0 # bias flag
         if hasattr(self.module,'stride'):  #0614
             if isinstance(self.module.stride,tuple):
                 self.stride_size = list(self.module.stride)
@@ -98,12 +102,14 @@ class LayerInfo:
                 self.pad_size = list(self.module.padding)
             else: # make a 2 elem list
                 self.pad_size = [self.module.padding,'']
-            
+        
+          
         """ Set num_params using the module's parameters.  """
         for name, param in self.module.named_parameters():
             self.num_params += param.nelement()
             self.trainable &= param.requires_grad
-
+            # ignore N, C when calculate Mult-Adds in ConvNd
+                                
             if name == "weight":
                 ksize = list(param.size())
                 # to make [in_shape, out_shape, ksize, ksize]
@@ -116,12 +122,31 @@ class LayerInfo:
                     self.macs += int(param.nelement() * np.prod(self.output_size[2:]))
                 else:
                     self.macs += param.nelement()
-
             # RNN modules have inner weights such as weight_ih_l0
             elif "weight" in name:
                 self.inner_layers[name] = list(param.size())
                 self.macs += param.nelement()
+            
+            if name == "bias":
+                ub=1
 
+        if "Conv" in self.class_name:
+            self.gemm = int(param.nelement() * np.prod(self.output_size[2:]))
+        if "BatchNorm2d" in self.class_name:
+            self.vect = np.prod(self.output_size[1:])*2 #1 elem* 1elem+
+        if "ReLU" in self.class_name:
+            self.acti = np.prod(self.output_size[1:])
+        if "MaxPool2d" in self.class_name:
+            ksize=self.module.kernel_size
+            csize=self.output_size[1]
+            self.kernel_size=(csize,csize,ksize,ksize)
+            self.vect = np.prod(self.output_size[1:])*(np.prod(self.kernel_size[2:])-1)            
+        if "Linear" in self.class_name:
+            lens = self.input_size[1]
+            units= self.output_size[1]
+            self.gemm = lens*units+ units*ub#1 add 2mac
+            #self.acti = units # no activations
+        
     def check_recursive(self, summary_list: "List[LayerInfo]") -> None:
         """ if the current module is already-used, mark as (recursive).
         Must check before adding line to the summary. """

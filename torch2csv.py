@@ -68,12 +68,14 @@ if isconv:
     header += 'k1,k2,' # kernel
     header += 's1,s2,' # stride
     header += 'p1,p2,' # padding
-    header += '#Para' # # of parameters
+    header += '#Para,' # # of parameters
+    header += 'gemm,vect,acti'
     header += '\n'
 else: # FC style networks
     header += 'I1,I2,I3,' # input: cinxhxw; multiple input in model statistics
     header += 'O1,O2,O3,' # output: coxhxw
     header += '#Para' # # of parameters
+    header += 'gemm,vect,acti'
     header += '\n'
 ms = header + ms
 fname=".//outputs//torch//" +nnname+".csv"

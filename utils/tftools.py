@@ -15,21 +15,25 @@ def headgen(isconv):
         linput=['I0_'+str(i) for i in range(dim)] + ['I1_'+str(i) for i in range(dim)]
         loutput=['O_'+str(i) for i in range(dim)]
         lweights = ['K_1','K_2','S_1','S_2','p_1','p_2']
-        largs =['size','','','ops','','']
+        largs =['SizeI','SizeO','SizeW','OpGemm','OpElem','OpActi']
         row0 = ['layer','type'] +linput + loutput + lweights + largs+['Misc']
-        largs =['input','output','weight','gemm','elem','acti']
-        row1 = ['','']+['']*len(linput + loutput + lweights) + largs +['']
+        # largs =['size','','','ops','','']
+        # row0 = ['layer','type'] +linput + loutput + lweights + largs+['Misc']
+        # largs =['input','output','weight','gemm','elem','acti']
+        # row1 = ['','']+['']*len(linput + loutput + lweights) + largs +['']
     else:
         dim=2 # 3 dim: B+ 1XW vector,no B
         linput=['I0_'+str(i) for i in range(dim)] + ['I1_'+str(i) for i in range(dim)]
         loutput=['O_'+str(i) for i in range(dim)]
         lweights = []
-        largs =['size','','','ops','','']
+        largs =['SizeI','SizeO','SizeW','OpGemm','OpElem','OpActi']
         row0 = ['layer','type'] +linput + loutput + lweights + largs+['Misc']
-        largs =['input','output','weight','gemm','elem','acti']
-        row1 = ['','']+['']*len(linput + loutput + lweights) + largs +['']
+        # largs =['size','','','ops','','']
+        # row0 = ['layer','type'] +linput + loutput + lweights + largs+['Misc']
+        # largs =['input','output','weight','gemm','elem','acti']
+        # row1 = ['','']+['']*len(linput + loutput + lweights) + largs +['']
     paralist.append(row0)
-    paralist.append(row1)
+    # paralist.append(row1)
     return paralist
 
 def inputgen(x,inp0,inp1,extin):
@@ -117,6 +121,7 @@ def outputgen(x,out,extin):
                      # outputs: features of a sentence
             seqlen = x.input_shape[1]
             datao= datao*seqlen
+            out[0] = seqlen # to fix output dim1 = None
          
     return out,datao,extin
 
@@ -195,7 +200,7 @@ def opscomputation(x,datao,inp0):
             ub = 1 if x.use_bias else 0
             # w1x+b
             gemm += seqlen*emblen*units +seqlen*units*ub
-            acti += seqlen*units
+            acti += seqlen*units #gelu
             # w2x+b
             gemm += seqlen*units*emblen +seqlen*emblen*ub
             acti += seqlen*emblen
@@ -205,6 +210,7 @@ def opscomputation(x,datao,inp0):
             ub = 1 if x.use_bias else 0
             units=x.units
             gemm = lens*units+ units*ub#1 add 2mac
+            acti = lens*ub
             
         if ltype=='Conv2D':
             gemm=np.prod(x.kernel_size)*inp0[2]*datao

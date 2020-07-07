@@ -86,6 +86,9 @@ class ModelStatistics:
             "kernel_size": layer_info.kernel_size[2:] if len(layer_info.kernel_size)>2 else ['',''],
             "pad_size": layer_info.pad_size if layer_info.pad_size else ['',''], #0614
             "stride_size": layer_info.stride_size if layer_info.stride_size else ['',''], #0614
+            "gemm": layer_info.gemm if layer_info.gemm else [''],
+            "vect": layer_info.vect if layer_info.vect else [''],
+            "acti":layer_info.acti if layer_info.acti else [''],
         }  #0615: list instead of string
         depth = layer_info.depth
         if self.formatting.use_branching==1: # 0615:for 3 cases
