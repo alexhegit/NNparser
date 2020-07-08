@@ -12,7 +12,7 @@
 import csv
 import utils.tftools as tt
 # model tobe loaded
-nnname = 'bert'
+nnname = 'ResNet50'
 
 def GetModel(nnname):
     isconv = True
