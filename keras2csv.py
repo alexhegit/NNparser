@@ -53,16 +53,10 @@ def GetModel(nnname):
         token_dict = get_base_dict()
         training = False
         if training:
-            model = get_model(token_num=len(token_dict),
-            head_num=5, transformer_num=12, training=training,
-            embed_dim=25, feed_forward_dim=100, seq_len=20, pos_num=20,
-            dropout_rate=0.05,
-            )
+            model = get_model(token_num=len(token_dict),training=training)
         else:
-            _,_,model = get_model(token_num=len(token_dict),
-                head_num=5, transformer_num=12, training=training,
-                embed_dim=25, feed_forward_dim=100, seq_len=20, pos_num=20,
-            )
+            _,_,model = get_model(token_num=len(token_dict),training=training)
+         
         compile_model(model)
         #model.summary()
 
