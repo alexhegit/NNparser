@@ -222,7 +222,7 @@ def opscomputation(x,datao,inp0):
             acti = datao  #activation functions
         
         if ltype=='DepthwiseConv2D':
-            gemm=np.prod(x.kernel_size)*inp0[2]*datao
+            gemm=np.prod(x.kernel_size)*datao
         
         if ltype=='MaxPooling2D':
             vect=datao*(np.prod(x.pool_size)-1) #max op
