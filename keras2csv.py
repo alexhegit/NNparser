@@ -47,7 +47,7 @@ def GetModel(nnname):
         isconv = False
     
     elif nnname == 'bert':
-        isconv =False
+        isconv =True
         from keras_bert import get_base_dict, get_model, compile_model
         # Build token dictionary
         token_dict = get_base_dict()
@@ -55,11 +55,11 @@ def GetModel(nnname):
         if training:
             model = get_model(token_num=len(token_dict),training=training)
         else:
+            # Revise lib\site-packages\keras_bert\bert.py: line164
+            # "return inputs, transformed" -> "return inputs, transformed,model"
             _,_,model = get_model(token_num=len(token_dict),training=training)
          
         compile_model(model)
-        #model.summary()
-
     return model,isconv
 
 
