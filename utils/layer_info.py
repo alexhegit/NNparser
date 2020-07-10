@@ -145,7 +145,8 @@ class LayerInfo:
             lens = self.input_size[1]
             units= self.output_size[1]
             self.gemm = lens*units+ units*ub#1 add 2mac
-            #self.acti = units # no activations
+        if "Sigmoid" in self.class_name:
+            self.gemm = self.output_size[1]
         
     def check_recursive(self, summary_list: "List[LayerInfo]") -> None:
         """ if the current module is already-used, mark as (recursive).
