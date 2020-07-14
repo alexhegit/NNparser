@@ -272,3 +272,4 @@ def pararetrival(x):
             ph=kh//2
             pw=kw//2
     return kh,kw,sh,sw,ph,pw
+

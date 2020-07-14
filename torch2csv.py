@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import torch
 from utils.torchsummary import summary
+import utils.formattable as ft
 from torchvision import models
 
 # torchvision: 
@@ -21,7 +22,7 @@ nnname = "dlrm"#"bert-base-cased"
 
 isconv = True
 depth = 4
-col_names_noconv=("input_size","output_size", "num_params","gemm","vect","acti")
+col_names_noconv=("input_size","output_size", "num_in","num_out","num_params","gemm","vect","acti")
 #two type of inputs in () 
 # real instances： real example in tensor format: () for multi-data,[] for args
 # shapes: tuple of shape, to produce random-value inputs; () for data,[] for args; 
@@ -32,6 +33,7 @@ if hasattr(models,nnname):
     ms=str(summary(model,shape, depth=depth,branching=2,verbose=1))
 
 if nnname =='dlrm':
+    depth=2
     isconv = False
     from torchmodels.dlrm.dlrm_s_pytorch import DLRM_Net
     import numpy as np
@@ -74,22 +76,48 @@ if nnname =='bert-base-cased':
     
 # csv gen
 header = 'layer' + ','*(depth)
+header=''
+for i in range(depth):
+    header += 'layer_l{},'.format(i)
+    
 if isconv:
     header += 'I1,I2,I3,' # input: cinxhxw; multiple input in model statistics
     header += 'O1,O2,O3,' # output: coxhxw
     header += 'k1,k2,' # kernel
     header += 's1,s2,' # stride
     header += 'p1,p2,' # padding
-    header += '#Para,' # # of parameters
-    header += 'gemm,vect,acti'
+    header += 'SizeI,SizeO,SizeW,' # # of parameters
+    header += 'OpGemm,OpVect,OpActi,'
     header += '\n'
 else: # FC style networks
     header += 'I1,I2,I3,' # input: cinxhxw; multiple input in model statistics
     header += 'O1,O2,O3,' # output: coxhxw
-    header += '#Para,' # # of parameters
-    header += 'gemm,vect,acti'
+    header += 'SizeI,SizeO,SizeW,' # of parameters
+    header += 'OpGemm,OpVect,OpActi,'
     header += '\n'
 ms = header + ms
-fname=".//outputs//torch//" +nnname+".csv"
-with open(fname,"w") as f:
-        f.write(ms)
+
+# fname=".//outputs//torch//" +nnname+".csv"
+# with open(fname,"w") as f:
+#         f.write(ms)
+        
+ms =ms.split('\n')
+ms = ms[:-1] # remove the last row 
+paralist=[]
+for row in ms:
+    lst=row.split(',')
+    for i in range(len(lst)):
+        lst[i] = int(lst[i]) if lst[i].strip().isnumeric() else lst[i].strip()
+    paralist.append(lst)
+    
+import  pandas as pd
+df = pd.DataFrame(paralist)
+df.drop(df.columns[[-1]],axis=1,inplace = True) # remove last column
+paraout = './/outputs//torch//'+nnname+'.xlsx'  
+with pd.ExcelWriter(paraout) as writer:
+    df.to_excel(writer,sheet_name='details')
+    writer.save()
+writer.close()
+
+maxVal=ft.SumTable(paraout)
+ft.FormatTable(paraout,maxVal)

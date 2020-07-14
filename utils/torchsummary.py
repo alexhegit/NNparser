@@ -21,7 +21,7 @@ def summary(
     *args: Any,
     batch_dim: int = 0,
     branching: int = 1, # 0: no branch,1:branch line,2: branch for csv
-    col_names: Sequence[str] = ("input_size","output_size","kernel_size", "stride_size", "pad_size", "num_params","gemm","vect","acti"),
+    col_names: Sequence[str] = ("input_size","output_size","kernel_size", "stride_size", "pad_size", "num_in","num_out","num_params","gemm","vect","acti"),
     col_width: int = 25,
     depth: int = 3,
     device: Optional[torch.device] = None,

@@ -79,7 +79,8 @@ class ModelStatistics:
         row_values = {
             "input_size": layer_info.input_size[1:] if len(layer_info.input_size)==4 else layer_info.input_size[1:]+(['']*(4-len(layer_info.input_size))), #0614, multiple in?
             "output_size": layer_info.output_size[1:] if len(layer_info.output_size)==4 else layer_info.output_size[1:]+(['']*(4-len(layer_info.output_size))),
-            #"num_params": layer_info.num_params_to_str(reached_max_depth),
+            "num_in": np.prod(layer_info.input_size[1:]),
+            "num_out": np.prod(layer_info.output_size[1:]),
             "num_params": layer_info.num_params if layer_info.num_params else '', #0615
             #"mult_adds": layer_info.macs_to_str(reached_max_depth),
             "mult_adds": layer_info.macs if layer_info.macs else '', #0615            

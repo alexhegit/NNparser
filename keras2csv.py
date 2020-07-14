@@ -11,6 +11,7 @@
 
 import csv
 import utils.tftools as tt
+import utils.formattable as ft
 # model tobe loaded
 nnname = 'ResNet50'
 
@@ -47,7 +48,7 @@ def GetModel(nnname):
         isconv = False
     
     elif nnname == 'bert':
-        isconv =True
+        isconv =False
         from keras_bert import get_base_dict, get_model, compile_model
         # Build token dictionary
         token_dict = get_base_dict()
@@ -118,13 +119,15 @@ for x in model.layers: #model.layers[::-1]
             new_row = [x.name,ltype]+ inp0[:dim]+inp1[:dim]+out[:dim]+[datai,datao,dataw,gemm,vect,acti,extin]
             paralist.append(new_row)
 
-# csv file to be exported
-paracsv = './/outputs//tf//'+nnname+'.csv'
-with open(paracsv, 'w', newline='') as file:
-    writer = csv.writer(file)
-    writer.writerows(paralist)
-        
-        
-    
-    
+           
+import  pandas as pd
+df = pd.DataFrame(paralist)
+paraout = './/outputs//tf//'+nnname+'.xlsx'  
+with pd.ExcelWriter(paraout) as writer:
+    df.to_excel(writer,sheet_name='details')
+    # dfsum.to_excel(writer,sheet_name='summary',index=Flase)
+    writer.save()
+writer.close()
 
+maxVal=ft.SumTable(paraout)
+ft.FormatTable(paraout,maxVal)
