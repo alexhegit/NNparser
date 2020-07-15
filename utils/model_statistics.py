@@ -33,6 +33,10 @@ class ModelStatistics:
         self.total_output, self.total_mult_adds = 0, 0
         for layer_info in summary_list:
             self.total_mult_adds += layer_info.macs
+            # if layer_info.is_recursive:
+            #     print(layer_info)
+            # if layer_info.module.children():
+            #     print(layer_info)
             if not layer_info.is_recursive:
                 if layer_info.depth == formatting.max_depth or (
                     not any(layer_info.module.children())

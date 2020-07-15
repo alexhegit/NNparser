@@ -103,7 +103,8 @@ class LayerInfo:
             else: # make a 2 elem list
                 self.pad_size = [self.module.padding,'']
         
-          
+        if self.class_name =='Bottleneck':
+            print()
         """ Set num_params using the module's parameters.  """
         for name, param in self.module.named_parameters():
             self.num_params += param.nelement()
@@ -129,9 +130,9 @@ class LayerInfo:
             
             if name == "bias":
                 ub=1
-
+        
         if "Conv" in self.class_name:
-            self.gemm = int(param.nelement() * np.prod(self.output_size[2:]))
+            self.gemm = int(np.prod(self.output_size[2:]) *np.prod(self.kernel_size))
         if "BatchNorm2d" in self.class_name:
             self.vect = np.prod(self.output_size[1:])*2 #1 elem* 1elem+
         if "ReLU" in self.class_name:
@@ -146,7 +147,7 @@ class LayerInfo:
             units= self.output_size[1]
             self.gemm = lens*units+ units*ub#1 add 2mac
         if "Sigmoid" in self.class_name:
-            self.gemm = self.output_size[1]
+            self.acti = self.output_size[1]
         
     def check_recursive(self, summary_list: "List[LayerInfo]") -> None:
         """ if the current module is already-used, mark as (recursive).
