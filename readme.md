@@ -38,17 +38,25 @@ Names of the tested nn models are listed at the beginning.  Set the variable 'nn
 
 The results are exported as the excel tables in ''/output/tf/''
 
+##### Note:
 
+- keras-bert module should be installed for keras version bert estimation. 
+
+- For bert inference model, an easy solution is to revise the orignal scirpts at:
+
+   	line164 of lib\site-packages\keras_bert\bert.py: 
+
+  ​	 "return inputs, transformed" -> "return inputs, transformed,model"
 
 ### Outputs
 
 The outputs are formatted tables with two sheets.  
 
-**1 summaries:**
+**1 summaries sheet:**
 
 ​	 Total counts of memory and computation costs
 
-**2 Details:**
+**2 Details sheet:**
 
 ​	The results are demonstrated at one nn layer per row. The meanings of columns as belows:
 
@@ -106,3 +114,6 @@ The outputs are formatted tables with two sheets.
 
 ​			The maximum matrix multi-add  costs : Green.
 
+### References:
+
+- Codes for Pytorch model estimation were revised based on [torch-summary](https://github.com/TylerYep/torch-summary) @TylerYep
