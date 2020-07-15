@@ -59,6 +59,7 @@ def FormatTable(tablename,maxValues):
     from openpyxl.styles import PatternFill
     from openpyxl.formatting.rule import CellIsRule
     maxSiActi = maxValues[0][0]
+    maxSiWeig = maxValues[0][1]
     maxOpGemm = maxValues[1][0]
     
     workbook = load_workbook(filename=tablename)
@@ -77,6 +78,8 @@ def FormatTable(tablename,maxValues):
         cell.font = ft
         if cell.value=='SizeO':
             so=cell.column_letter
+        if cell.value=='SizeW':
+            sw=cell.column_letter
         if cell.value=='OpGemm':
             og=cell.column_letter
             
@@ -85,21 +88,15 @@ def FormatTable(tablename,maxValues):
     myrule= CellIsRule(operator='equal', formula=['{}'.format(maxSiActi)], stopIfTrue=True, fill=background)
     sheet.conditional_formatting.add(so+'{}:'.format(sheet.min_row)+so+'{}'.format(sheet.max_row), myrule)
     
+        # Max activation row with pink
+    background = PatternFill(bgColor="00FF00FF")
+    myrule= CellIsRule(operator='equal', formula=['{}'.format(maxSiWeig)], stopIfTrue=True, fill=background)
+    sheet.conditional_formatting.add(sw+'{}:'.format(sheet.min_row)+sw+'{}'.format(sheet.max_row), myrule)
+    
     #  Max Ops Gemm row with green
     background = PatternFill(bgColor="0000FF00")
     myrule= CellIsRule(operator='equal', formula=['{}'.format(maxOpGemm)], stopIfTrue=True, fill=background)
     sheet.conditional_formatting.add(og+'{}:'.format(sheet.min_row)+og+'{}'.format(sheet.max_row), myrule)
-    
-    #https://openpyxl.readthedocs.io/en/stable/formatting.html
-    # from openpyxl.styles.differential import DifferentialStyle
-    # from openpyxl.utils.cell import get_column_letter
-    # from openpyxl.formatting.rule import Rule
-    # background = PatternFill(bgColor="0000FF00")
-    # diff_style = DifferentialStyle(fill=background)
-    # rule = Rule(type="expression", dxf=diff_style)
-    # rule.formula = ["$U1= {}".format(maxOpGemm)]
-    # lastcol =  get_column_letter(sheet.max_column)
-    # sheet.conditional_formatting.add('A{}:'.format(sheet.min_row)+lastcol+'{}'.format(sheet.max_row), rule)
-    
+        
     
     workbook.save(tablename)

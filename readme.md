@@ -52,9 +52,15 @@ The outputs are formatted tables with two sheets.
 
 ​	The results are demonstrated at one nn layer per row. The meanings of columns as belows:
 
+​	**Layer:**
+
+​		TF Keras: Layer names & Types
+
+​		Pytorch:  layer names in multi-levels
+
 ​	**Input tensors :**
 
-​		tf keras version: 
+​		TF Keras version: 
 
 ​			I0_1,I0_2, I0_3: the shape of the first input
 
@@ -92,5 +98,11 @@ The outputs are formatted tables with two sheets.
 
 ​	**Color bars** of extreme cells
 
-​		In the table, the cells/layers with the maximum memory cost are marked in Red, and the cells/layers with the maximum computation costs are marked in Blue.
+​		The cells/layers with the maximum  cost are marked as:
+
+​			The maximum output Tensor:  Red,
+
+​			The maximum weight tensor: Pink
+
+​			The maximum matrix multi-add  costs : Green.
 
