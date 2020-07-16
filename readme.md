@@ -6,7 +6,9 @@ The tools were built for AI hardware/ software architecture to quickly understan
 
 1 clone the repository to the local drive. 
 
-2 Besides ML frameworks, Python modules pandas, numpy, opnpyxl, scikit-learn, matplotlib may have to be installed
+2 The working requirements are: Python 3.6+,  Tensorflow 2.0 +, Pytorch 1.5+
+
+3 Besides, Python modules pandas, numpy, opnpyxl, scikit-learn, matplotlib may have to be installed
 
 
 
@@ -24,9 +26,7 @@ The tools were built for AI hardware/ software architecture to quickly understan
 
 ##### Note:
 
-- For transformer models, [Huggingface's Transformer package](https://github.com/huggingface/transformers) should be installed.
-
-- For DIEN/NCF models, packages from [tensorflow/models](https://github.com/tensorflow/models) should be included. A easier solution is to clone the codes to a folder, and add the folder into PYTHONPATH
+- For DIN model, packages from [tensorflow/models](https://github.com/tensorflow/models) should be included. A easier solution is to clone the codes to a folder, and add the folder into PYTHONPATH
 
 
 
@@ -54,7 +54,9 @@ The outputs are formatted tables with two sheets.
 
 **1 summaries sheet:**
 
-​	 Total counts of memory and computation costs
+​	 Total counts of memory and computation costs. 
+
+​	Note that  1M = 1024 x 1024, and 1G= 1M x 1024 in this table
 
 **2 Details sheet:**
 
