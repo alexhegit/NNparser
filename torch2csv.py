@@ -87,13 +87,13 @@ if isconv:
     header += 's1,s2,' # stride
     header += 'p1,p2,' # padding
     header += 'SizeI,SizeO,SizeW,' # # of parameters
-    header += 'OpGemm,OpVect,OpActi,'
+    header += 'OpGemm,OpElem,OpActi,'
     header += '\n'
 else: # FC style networks
     header += 'I1,I2,I3,' # input: cinxhxw; multiple input in model statistics
     header += 'O1,O2,O3,' # output: coxhxw
     header += 'SizeI,SizeO,SizeW,' # of parameters
-    header += 'OpGemm,OpVect,OpActi,'
+    header += 'OpGemm,OpElem,OpActi,'
     header += '\n'
 ms = header + ms
 

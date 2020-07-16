@@ -31,23 +31,19 @@ class ModelStatistics:
         self.formatting = formatting
         self.total_params, self.trainable_params = 0, 0
         self.total_output, self.total_mult_adds = 0, 0
-        for layer_info in summary_list:
-            self.total_mult_adds += layer_info.macs
-            # if layer_info.is_recursive:
-            #     print(layer_info)
-            # if layer_info.module.children():
-            #     print(layer_info)
-            if not layer_info.is_recursive:
-                if layer_info.depth == formatting.max_depth or (
-                    not any(layer_info.module.children())
-                    and layer_info.depth < formatting.max_depth
-                ):
-                    self.total_params += layer_info.num_params
-                    if layer_info.trainable:
-                        self.trainable_params += layer_info.num_params
-                if layer_info.num_params > 0 and not any(layer_info.module.children()):
-                    # x2 for gradients
-                    self.total_output += 2.0 * abs(np.prod(layer_info.output_size))
+        # for layer_info in summary_list:
+        #     self.total_mult_adds += layer_info.macs
+        #     if not layer_info.is_recursive:
+        #         if layer_info.depth == formatting.max_depth or (
+        #             not any(layer_info.module.children())
+        #             and layer_info.depth < formatting.max_depth
+        #         ):
+        #             self.total_params += layer_info.num_params
+        #             if layer_info.trainable:
+        #                 self.trainable_params += layer_info.num_params
+        #         if layer_info.num_params > 0 and not any(layer_info.module.children()):
+        #             # x2 for gradients
+        #             self.total_output += 2.0 * abs(np.prod(layer_info.output_size))
 
     @staticmethod
     def to_bytes(num: int) -> float:
