@@ -80,7 +80,7 @@
 
 - type the command as the following format to get the results
 
-  ​	`python tensor2table.py -n resnet50 -b 1 -e 1` 
+  ​	`python torch2table.py -n resnet50 -b 1 -e 1` 
 
 - three optional arguments are:
 
