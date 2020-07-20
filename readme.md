@@ -48,7 +48,7 @@
 
 - three optional arguments are:
 
-  -n: the name of the neural network model. Tested models are listed belwo. Please note that the name is *case-sensitive*
+  -n: the name of the neural network model. Tested models are listed below. Please note that the name is **case-sensitive**
 
   -b: batch-size of the input data
 
@@ -74,17 +74,17 @@
 
 2. Recomendation: dlrm
 
-### 2.2.Tensorflow version: keras2table
+### 2.2. Tensorflow version: keras2table
 
 ##### 2.2.1. Command
 
 - type the command as the following format to get the results
 
-  ​	`python torch2table.py -n resnet50 -b 1 -e 1` 
+  ​	`python keras2table.py -n ResNet50 -b 1 -e 1` 
 
 - three optional arguments are:
 
-  -n: the name of the neural network model. Tested models are listed belwo. Please note that the name is *case-sensitive*
+  -n: the name of the neural network model. Tested models are listed below. Please note that the name is **case-sensitive**
 
   -b: batch-size of the input data
 
