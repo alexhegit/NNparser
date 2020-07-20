@@ -9,6 +9,7 @@ import numpy as np
 import  pandas as pd
 import utils.formattable as ft
 
+
 def headgen(isconv):
     # to do: adjust the names according to models
     paralist = []
@@ -209,7 +210,8 @@ def opscomputation(x,datao,inp0):
             acti = lens*ub
             
         if ltype=='Conv2D':
-            gemm=np.prod(x.kernel_size)*inp0[2]*datao
+            ub = 1 if x.use_bias else 0
+            gemm=np.prod(x.kernel_size)*inp0[2]*datao+x.output_shape[3]*ub
             
         if ltype== 'GlobalAveragePooling2D':
             vect=datao*(inp0[0]*inp0[1]-1) #add op
@@ -218,7 +220,8 @@ def opscomputation(x,datao,inp0):
             acti = datao  #activation functions
         
         if ltype=='DepthwiseConv2D':
-            gemm=np.prod(x.kernel_size)*datao
+            ub = 1 if x.use_bias else 0
+            gemm=np.prod(x.kernel_size)*datao+x.output_shape[3]*ub
         
         if ltype=='MaxPooling2D':
             vect=datao*(np.prod(x.pool_size)-1) #max op
@@ -270,7 +273,10 @@ def pararetrival(x):
     return kh,kw,sh,sw,ph,pw
 
 
-def GetModel(nnname):
+def GetModel(ucfg):
+    ''' ucfg: user's Config for the table output: nnname, BS, BPE '''
+    
+    nnname = ucfg['nnname']
     isconv = True
 
     import tensorflow.keras.applications as nn
@@ -301,18 +307,23 @@ def GetModel(nnname):
         from keras_bert import get_base_dict, get_model, compile_model
         # Build token dictionary
         token_dict = get_base_dict()
-        training = False
+        training = True
         if training:
-            model = get_model(token_num=len(token_dict),training=training)
+            model = get_model(token_num=len(token_dict),embed_dim=1024,head_num=16,training=training)
         else:
             # Revise lib\site-packages\keras_bert\bert.py: line164
             # "return inputs, transformed" -> "return inputs, transformed,model"
-            _,_,model = get_model(token_num=len(token_dict),training=training)
+            _,_,model = get_model(token_num=len(token_dict),embed_dim=1024,head_num=16,training=training)
          
         compile_model(model)
+    if True:
+        g = keras.utils.model_to_dot(model,show_shapes=True)
+        g.write_pdf(".//outputs//tf//"+nnname+'.pdf')
+        # keras.utils.plot_model(model,".//outputs//tf//"+nnname+'.pdf',show_shapes=True)
     return model,isconv
 
-def ListGen(model,isconv):
+def ListGen(model,isconv,ucfg):
+    bs=ucfg['batchsize']*ucfg['BPE']
     paralist=headgen(isconv)
     for x in model.layers: #model.layers[::-1]
          # no batch, hxwxc
@@ -346,7 +357,9 @@ def ListGen(model,isconv):
          
         # if isinstance(x, keras.layers.Lambda):
         #     print('')
-            
+        datai = datai*bs
+        datao = datao*bs
+        dataw = dataw*bs
         if isconv:
             new_row = [x.name,ltype]+ inp0+inp1+out+[kh,kw,sh,sw,ph,pw,datai,datao,dataw,gemm,vect,acti,extin]
             paralist.append(new_row)

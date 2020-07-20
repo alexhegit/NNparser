@@ -24,6 +24,7 @@ class ModelStatistics:
         summary_list: List[LayerInfo],
         input_size: CORRECTED_INPUT_SIZE_TYPE,
         formatting: FormattingOptions,
+        ucfg:{},
     ):
         self.summary_list = summary_list
         self.input_size = input_size
@@ -31,19 +32,8 @@ class ModelStatistics:
         self.formatting = formatting
         self.total_params, self.trainable_params = 0, 0
         self.total_output, self.total_mult_adds = 0, 0
-        # for layer_info in summary_list:
-        #     self.total_mult_adds += layer_info.macs
-        #     if not layer_info.is_recursive:
-        #         if layer_info.depth == formatting.max_depth or (
-        #             not any(layer_info.module.children())
-        #             and layer_info.depth < formatting.max_depth
-        #         ):
-        #             self.total_params += layer_info.num_params
-        #             if layer_info.trainable:
-        #                 self.trainable_params += layer_info.num_params
-        #         if layer_info.num_params > 0 and not any(layer_info.module.children()):
-        #             # x2 for gradients
-        #             self.total_output += 2.0 * abs(np.prod(layer_info.output_size))
+        self.bs = ucfg['batchsize']*ucfg['BPE'] #input batch size and BPE
+
 
     @staticmethod
     def to_bytes(num: int) -> float:
@@ -79,10 +69,9 @@ class ModelStatistics:
         row_values = {
             "input_size": layer_info.input_size[1:] if len(layer_info.input_size)==4 else layer_info.input_size[1:]+(['']*(4-len(layer_info.input_size))), #0614, multiple in?
             "output_size": layer_info.output_size[1:] if len(layer_info.output_size)==4 else layer_info.output_size[1:]+(['']*(4-len(layer_info.output_size))),
-            "num_in": np.prod(layer_info.input_size[1:]),
-            "num_out": np.prod(layer_info.output_size[1:]),
-            "num_params": layer_info.num_params if layer_info.num_params else '', #0615
-            #"mult_adds": layer_info.macs_to_str(reached_max_depth),
+            "num_in": np.prod(layer_info.input_size[1:])*self.bs,
+            "num_out": np.prod(layer_info.output_size[1:])*self.bs,
+            "num_params": layer_info.num_params*self.bs if layer_info.num_params else '', #0615
             "mult_adds": layer_info.macs if layer_info.macs else '', #0615            
             "kernel_size": layer_info.kernel_size[2:] if len(layer_info.kernel_size)>2 else ['',''],
             "pad_size": layer_info.pad_size if layer_info.pad_size else ['',''], #0614

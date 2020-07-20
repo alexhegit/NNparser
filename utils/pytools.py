@@ -7,11 +7,16 @@ Created on Thu Jul 16 11:47:13 2020
 
 import torch
 from utils.torchsummary import summary
+# from torch.autograd import Variable
 import utils.formattable as ft
+import utils.dotGen as dg
 from torchvision import models
 import  pandas as pd
 
-def modelLst(nnname):
+def modelLst(ucfg):
+    ''' ucfg: user's Config for the table output: nnname, BS, BPE '''
+    
+    nnname = ucfg['nnname']
     # produce config list of models per layer of the given nn model name
     isconv = True
     depth = 4
@@ -22,8 +27,13 @@ def modelLst(nnname):
     # vision models in torchvision
     if hasattr(models,nnname):
         model = getattr(models, nnname)()
+        x = torch.rand(1,3,224,224)
+        if True:
+            y = model(x)
+            outputname='.//outputs//torch//'+nnname
+            dg.graph(y,outputname)
         shape=(3, 224, 224)
-        ms=str(summary(model,shape, depth=depth,branching=2,verbose=1))
+        ms=str(summary(model,shape, depth=depth,branching=2,verbose=1,ucfg=ucfg))
     
     if nnname =='dlrm':
         depth=2
@@ -45,13 +55,18 @@ def modelLst(nnname):
             )
         x = torch.rand(2,ln_bot[0]) # dual samples
         lS_i = [torch.Tensor([0,1,2]).to(torch.long)]*len(ln_emb) # numof indices >=1, but < ln_emb[i]
-        lS_o = torch.Tensor([[0,2]]*len(ln_emb)).to(torch.long)
+        lS_o = torch.Tensor([[0,2]]*len(ln_emb)).to(torch.long)        
+        if True:
+            y = model(x,lS_o,lS_i)
+            outputname='.//outputs//torch//'+nnname
+            dg.graph(y,outputname)
         inst = (x,[lS_o,lS_i])
+        
         if isconv:
-            ms=str(summary(model,inst, depth=depth,branching=2,verbose=1,device='cpu'))
+            ms=str(summary(model,inst, depth=depth,branching=2,verbose=1,device='cpu',ucfg=ucfg))
         else:
             col_names =col_names_noconv
-            ms=str(summary(model,inst, col_names=col_names, depth=depth,branching=2,verbose=1,device='cpu'))
+            ms=str(summary(model,inst, col_names=col_names, depth=depth,branching=2,verbose=1,device='cpu',ucfg=ucfg))
     
     if nnname =='bert-base-cased':
         isconv = False
@@ -65,10 +80,11 @@ def modelLst(nnname):
             ms=str(summary(model,inst, depth=depth,branching=2,verbose=1))
         else:
             col_names =col_names_noconv
-            ms=str(summary(model,inst, col_names=col_names,depth=depth,branching=2,verbose=1))
+            ms=str(summary(model,inst, col_names=col_names,depth=depth,branching=2,verbose=1,ucfg=ucfg))
+
     return ms, depth, isconv
 
-# csv gen
+# table gen
 def tableGen(ms,depth,isconv):
     # produce table text lst
     header = 'layer' + ','*(depth)

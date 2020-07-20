@@ -20,13 +20,14 @@ def summary(
     input_data: Union[torch.Tensor, torch.Size, Sequence[torch.Tensor], INPUT_SIZE_TYPE],
     *args: Any,
     batch_dim: int = 0,
-    branching: int = 1, # 0: no branch,1:branch line,2: branch for csv
+    branching: int = 1, # 0: no branch,1:branch line,2: branch 
     col_names: Sequence[str] = ("input_size","output_size","kernel_size", "stride_size", "pad_size", "num_in","num_out","num_params","gemm","vect","acti"),
     col_width: int = 25,
     depth: int = 3,
     device: Optional[torch.device] = None,
     dtypes: Optional[List[torch.dtype]] = None,
     verbose: int = 1,
+    ucfg: {}, # user config: name, bs,bpe
     **kwargs: Any
 ) -> ModelStatistics:
     """
@@ -117,9 +118,7 @@ def summary(
 
     formatting = FormattingOptions(branching, depth, verbose, col_names, col_width)
     formatting.set_layer_name_width(summary_list)
-    results = ModelStatistics(summary_list, input_size, formatting)
-    # if verbose > Verbosity.QUIET.value:
-    #     print(results)
+    results = ModelStatistics(summary_list, input_size, formatting,ucfg)
     return results
 
 
@@ -200,6 +199,7 @@ def apply_hooks(
     idx: Dict[int, int],
     batch_dim: int,
     curr_depth: int = 0,
+    
 ) -> None:
     """ Recursively adds hooks to all layers of the model. """
 

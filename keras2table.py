@@ -12,13 +12,22 @@ import utils.tftools as tt
     # 3 EfficientNet: EfficientNetB0 ~ EfficientNetB7
     # 4 NLP: bert
 
-# model to be loaded
-nnname = 'ResNet50V2'
+import argparse
+parser = argparse.ArgumentParser()
 
-(model,isconv) = tt.GetModel(nnname) 
+parser.add_argument("-n","--nnname", help="Neural Networkto be parsed",
+                    default='bert')
+parser.add_argument("-b","--batchsize", help="Batch Sized",
+                    default=1, type=int)
+parser.add_argument("-e","--BPE", help="Byte per element",
+                    default=1, type=int)
+args = parser.parse_args()
+
+(model,isconv) = tt.GetModel(vars(args)) 
 
 # Producing Parameter table of given Model 
-paralist = tt.ListGen(model,isconv) 
+paralist = tt.ListGen(model,isconv,vars(args)) 
     
 # exproting tables to //outputs//tf
+nnname = args.nnname
 tt.tableExport(paralist,nnname)

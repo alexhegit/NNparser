@@ -31,8 +31,8 @@ def SumTable(paraout):
     
     sumVal = df.sum()
     sumlst = [
-                ['Total Activations(MB):',sumVal.SizeO/(1024*1024)],
-                ['Total Weights(MB):',sumVal.SizeW/(1024*1024)],
+                ['Total Activations(MB):',sumVal.SizeO/(1024**2)],
+                ['Total Weights(MB):',sumVal.SizeW/(1024**2)],
                 ['Total Gemm (G_ops):',sumVal.OpGemm/(1024**3)]
               ]
     

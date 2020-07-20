@@ -11,14 +11,23 @@ import utils.pytools as pt
 #   MNASNet'n'_'n'
 
 # 2. Recomendation:
-#    DLRM
+#    dlrm
+
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("-n","--nnname", help="Neural Network to be parsed",
+                    default='resnet50')
+parser.add_argument("-b","--batchsize", help="Batch Sized",
+                    default=1, type=int)
+parser.add_argument("-e","--BPE", help="Byte per element",
+                    default=1, type=int)
+args = parser.parse_args()
 
 
-# model to be loaded
-nnname = "resnet50"
 # producing the table of the model paramter list
-(ms, depth, isconv) = pt.modelLst(nnname)    
+(ms, depth, isconv) = pt.modelLst(vars(args))    
 ms = pt.tableGen(ms,depth,isconv)
 
 # exporting the table at //output//torch//
+nnname = args.nnname
 pt.tableExport(ms,nnname)
