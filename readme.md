@@ -234,7 +234,49 @@
 
 
 
+### Example 3: Add a new model in pytorch
 
+The  tool can parse a new model if one can add the model definition in the codes, as shown below:
+
+1. open the function modelLst() in //utils//pytools.py
+
+2. Assume the model name is "mymodel" as shown in line 78
+
+3. Add the model definitions between line "===== To add a customized model ===="  and "===== end of your codes ======"
+
+   A simple example for [pytorch tutoria](https://pytorch.org/tutorials/beginner/pytorch_with_examples.html)l is listed between these two lines. They can easily replaced by other model definitions:
+
+   ​	`# model cfgs`
+
+   ​    `N, D_in, H, D_out = 64, 1000, 100, 10`
+
+   ​    `# Create random input Tensors` 
+
+   ​    `x = torch.randn(N, D_in)`
+
+   ​    `# define the NN model using pytorch operators.`
+
+   ​    `model = torch.nn.Sequential(`
+
+   ​      `torch.nn.Linear(D_in, H),`
+
+   ​      `torch.nn.ReLU(),`
+
+   ​      `torch.nn.Linear(H, D_out),`
+
+   ​    `)`
+
+4. save the revised codes
+
+5. in cmd window, type the command:
+
+   ​	`python keras2table.py -n mymodel`
+
+6. the corresponded graph and table will be exported into "//outputs//pytorch"
+
+   
+
+Please note that special network structures and customized operators may not be supported by the tool. Feel free to join us to extend the functions of the tool.
 
 
 

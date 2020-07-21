@@ -25,9 +25,9 @@ args = parser.parse_args()
 
 
 # producing the table of the model paramter list
-(ms, depth, isconv) = pt.modelLst(vars(args))    
+(ms, depth, isconv,y) = pt.modelLst(vars(args))    
 ms = pt.tableGen(ms,depth,isconv)
 
 # exporting the table at //output//torch//
 nnname = args.nnname
-pt.tableExport(ms,nnname)
+pt.tableExport(ms,nnname,y)

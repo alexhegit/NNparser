@@ -28,10 +28,7 @@ def modelLst(ucfg):
     if hasattr(models,nnname):
         model = getattr(models, nnname)()
         x = torch.rand(1,3,224,224)
-        if True:
-            y = model(x)
-            outputname='.//outputs//torch//'+nnname
-            dg.graph(y,outputname)
+        y = model(x)
         shape=(3, 224, 224)
         ms=str(summary(model,shape, depth=depth,branching=2,verbose=1,ucfg=ucfg))
     
@@ -55,13 +52,9 @@ def modelLst(ucfg):
             )
         x = torch.rand(2,ln_bot[0]) # dual samples
         lS_i = [torch.Tensor([0,1,2]).to(torch.long)]*len(ln_emb) # numof indices >=1, but < ln_emb[i]
-        lS_o = torch.Tensor([[0,2]]*len(ln_emb)).to(torch.long)        
-        if True:
-            y = model(x,lS_o,lS_i)
-            outputname='.//outputs//torch//'+nnname
-            dg.graph(y,outputname)
-        inst = (x,[lS_o,lS_i])
-        
+        lS_o = torch.Tensor([[0,2]]*len(ln_emb)).to(torch.long)
+        y = model(x,lS_o,lS_i)
+        inst = (x,[lS_o,lS_i])        
         if isconv:
             ms=str(summary(model,inst, depth=depth,branching=2,verbose=1,device='cpu',ucfg=ucfg))
         else:
@@ -81,8 +74,32 @@ def modelLst(ucfg):
         else:
             col_names =col_names_noconv
             ms=str(summary(model,inst, col_names=col_names,depth=depth,branching=2,verbose=1,ucfg=ucfg))
+    
+    if nnname =='mymodel':
+        depth=2
+        isconv = False
 
-    return ms, depth, isconv
+        ## ===== To add a customized model ====
+        
+        # model cfgs
+        N, D_in, H, D_out = 64, 1000, 100, 10
+        # Create random input Tensors 
+        x = torch.randn(N, D_in)
+     
+        # define the NN model using pytorch operators.
+        model = torch.nn.Sequential(
+            torch.nn.Linear(D_in, H),
+            torch.nn.ReLU(),
+            torch.nn.Linear(H, D_out),
+        )
+
+        ## ===== end of your codes  ======
+
+        y = model(x)
+        ms=str(summary(model,x, depth=depth,branching=2,verbose=1,ucfg=ucfg))
+        
+
+    return ms, depth, isconv,y
 
 # table gen
 def tableGen(ms,depth,isconv):
@@ -110,7 +127,7 @@ def tableGen(ms,depth,isconv):
     ms = header + ms
     return ms
 
-def tableExport(ms,nnname):        
+def tableExport(ms,nnname,y):        
     ms =ms.split('\n')
     ms = ms[:-1] # remove the last row 
     paralist=[]
@@ -129,3 +146,7 @@ def tableExport(ms,nnname):
     writer.close()
     maxVal=ft.SumTable(paraout)
     ft.FormatTable(paraout,maxVal)
+    
+    if True:
+        outputname='.//outputs//torch//'+nnname
+        dg.graph(y,outputname)
