@@ -244,7 +244,7 @@ The  tool can parse a new model if one can add the model definition in the codes
 
 3. Add the model definitions between line "===== To add a customized model ===="  and "===== end of your codes ======"
 
-   A simple example for [pytorch tutoria](https://pytorch.org/tutorials/beginner/pytorch_with_examples.html)l is listed between these two lines. They can easily replaced by other model definitions:
+   A simple example for [pytorch tutoria](https://pytorch.org/tutorials/beginner/pytorch_with_examples.html)l is listed between these two lines. It can be easily replaced by other model definitions:
 
    ​	`# model cfgs`
 
