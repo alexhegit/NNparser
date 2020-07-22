@@ -234,9 +234,9 @@
 
 
 
-### Example 3: Add a new model in pytorch
+### Example 3: Add a new model 
 
-The  tool can parse a new model if one can add the model definition in the codes, as shown below:
+The  tool can parse a new model if one can add the model definition in the codes.  Steps to add a *pytorch* model  are shown below:
 
 1. open the function modelLst() in //utils//pytools.py
 
@@ -275,6 +275,10 @@ The  tool can parse a new model if one can add the model definition in the codes
 6. the corresponded graph and table will be exported into "//outputs//pytorch"
 
    
+
+Steps to add a *keras* model are similar. Please refer to line 321-344 in GetModel() at [utils//tftools.py](./utils/tftools.py) for details.
+
+
 
 Please note that special network structures and customized operators may not be supported by the tool. Feel free to join us to extend the functions of the tool.
 

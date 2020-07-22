@@ -302,6 +302,7 @@ def GetModel(ucfg):
         _, model = getattr(nn, name)(item_count=63001, cate_count=801, hidden_units=128)
         isconv = False
     
+    # bert from bert_keras
     elif nnname == 'bert':
         isconv =False
         from keras_bert import get_base_dict, get_model, compile_model
@@ -316,6 +317,32 @@ def GetModel(ucfg):
             _,_,model = get_model(token_num=len(token_dict),embed_dim=1024,head_num=16,training=training)
          
         compile_model(model)
+    
+    if nnname =='mymodel':
+        isconv = False
+
+        ## ===== To add a customized model ====
+        # refer to: https://keras.io/guides/sequential_model/
+        from tensorflow.keras import layers
+        # Define a customized model
+        model = keras.Sequential()
+        model.add(keras.Input(shape=(250, 250, 3)))  # 250x250 RGB images
+        model.add(layers.Conv2D(32, 5, strides=2, activation="relu"))
+        model.add(layers.Conv2D(32, 3, activation="relu"))
+        model.add(layers.MaxPooling2D(3))
+        model.add(layers.Conv2D(32, 3, activation="relu"))
+        model.add(layers.Conv2D(32, 3, activation="relu"))
+        model.add(layers.MaxPooling2D(3))
+        model.add(layers.Conv2D(32, 3, activation="relu"))
+        model.add(layers.Conv2D(32, 3, activation="relu"))
+        model.add(layers.MaxPooling2D(2))
+        # Now that we have 4x4 feature maps, time to apply global max pooling.
+        model.add(layers.GlobalMaxPooling2D())
+        # Finally, we add a classification layer.
+        model.add(layers.Dense(10))
+
+        ## ===== end of your codes  ======
+    
     if True:
         g = keras.utils.model_to_dot(model,show_shapes=True)
         g.write_pdf(".//outputs//tf//"+nnname+'.pdf')
