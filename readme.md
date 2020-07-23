@@ -74,6 +74,8 @@
 
 2. Recomendation: dlrm
 
+3. Others Models can also be imported, as long as a input tensor is provided  with the model. Please refer to **Section 4, example** **3** for details.
+
 ### 2.2. Tensorflow version: keras2table
 
 ##### 2.2.1. Command
@@ -210,7 +212,7 @@
 
 ​	One can further analyze the various configures of a NN models by changing default settings in the codes. Two examples are shown below.   
 
-​	Note that the functions ( getmodel() & modellst() ) mentioned below also demonstrate the ways to add a neural network model. Additional neural network models can be added using the similar approaches. 
+​	Note that the functions ( getmodel() & modelLst() ) mentioned below also demonstrate the ways to add a neural network model. Additional neural network models can be added using the similar approaches. 
 
 ### Example 1: bert in keras-tf
 
@@ -238,7 +240,7 @@
 
 The  tool can parse a new model if one can add the model definition in the codes.  Steps to add a *pytorch* model  are shown below:
 
-1. open the function modelLst() in //utils//pytools.py
+1. open the function modellst() in //utils//pytools.py
 
 2. Assume the model name is "mymodel" as shown in line 78
 
@@ -246,25 +248,27 @@ The  tool can parse a new model if one can add the model definition in the codes
 
    A simple example for [pytorch tutoria](https://pytorch.org/tutorials/beginner/pytorch_with_examples.html)l is listed between these two lines. It can be easily replaced by other model definitions:
 
-   ​	`# model cfgs`
+   - Define a random input tensor for the model    
 
-   ​    `N, D_in, H, D_out = 64, 1000, 100, 10`
+     ​      `x = torch.randn(N, D_in)`
 
-   ​    `# Create random input Tensors` 
+   - Get the model definition. 
 
-   ​    `x = torch.randn(N, D_in)`
+     ​      `N, D_in, H, D_out = 64, 1000, 100, 10`
 
-   ​    `# define the NN model using pytorch operators.`
+     ​      `model = torch.nn.Sequential(`
 
-   ​    `model = torch.nn.Sequential(`
+     ​      `torch.nn.Linear(D_in, H),`
 
-   ​      `torch.nn.Linear(D_in, H),`
+     ​      `torch.nn.ReLU(),`
 
-   ​      `torch.nn.ReLU(),`
+     ​      `torch.nn.Linear(H, D_out),`
 
-   ​      `torch.nn.Linear(H, D_out),`
+     ​    `)`
 
-   ​    `)`
+     Instead of definition in the scripts, a predefined model can also be imported, 
+
+      	 `model = predefinedModel(...)`
 
 4. save the revised codes
 
