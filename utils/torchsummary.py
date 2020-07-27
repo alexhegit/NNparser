@@ -73,26 +73,32 @@ def summary(
     if isinstance(input_data, torch.Tensor):
         input_size = get_correct_input_sizes(input_data.size())
         x = [input_data.to(device)]
-    # ======================multiple input    
-    elif isinstance(input_data, (list, tuple)):
-        if any(isinstance(data, torch.Tensor) for data in input_data): #real input
-            # scanning all elements in the tuple
-            for item in input_data:
-                if isinstance(item, torch.Tensor):# single input
-                    input_size = get_correct_input_sizes(item.size())
-                    x = [item.to(device)]
-                elif isinstance(item, tuple):#add all inputs in tensor
-                    input_sizes = [data.size() for data in item]  # type: ignore
-                    input_size = get_correct_input_sizes(input_sizes)
-                    x = [data.to(device) for data in item]
-                elif isinstance(item, list): # add args one by one
-                    for arg in item:
-                        x.append(arg)
-        else: # input shape
-            if dtypes is None:
-                dtypes = [torch.float] * len(input_data)
-            input_size = get_correct_input_sizes(input_data)
-            x = get_input_tensor(input_size, batch_dim, dtypes, device)
+    # ====================== input with args : ([x],[args])   
+    elif isinstance(input_data,  tuple):
+        # x list
+        inputx = input_data[0] 
+        x=[]
+        if not isinstance(inputx,list):
+            input_size = get_correct_input_sizes(inputx.size())
+            x = [inputx.to(device)]
+        else: # mutiple input in list
+            if all(isinstance(data, torch.Tensor) for data in inputx): #real input
+                # scanning all elements in the tuple
+                input_sizes = [data.size() for data in inputx]  # type: ignore
+                input_size = get_correct_input_sizes(input_sizes)
+                x = [data.to(device) for data in inputx]
+            else: # input shape: not used in this version
+                for item in inputx:
+                    if dtypes is None:
+                        dtypes = [torch.float] * len(item)
+                        input_size = get_correct_input_sizes(item)
+                        x.append( get_input_tensor(input_size, batch_dim, dtypes, device))
+            
+        # args list
+        if len(input_data)>1:
+            inputarg = input_data[1]
+            for arg in inputarg:
+                x.append(arg)
     else:
         raise TypeError(
             "Input type is not recognized. Please ensure input_data is valid.\n"

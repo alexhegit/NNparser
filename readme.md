@@ -60,6 +60,8 @@
 
 1. torchvision: 
 
+   - base models
+
    ​	alexnet, vgg11, vgg13, vgg16, vgg19, vgg11_bn, vgg_13 bn, vgg16_bn,
 
    ​	vgg19_bn, resnet18, resnet34, resnet50, resnet101, resnet152, 
@@ -72,7 +74,13 @@
 
    ​	MNASNet'n'_'n'
 
-2. Recomendation: dlrm
+   - detection model
+
+   ​	maskrcnn 
+
+2. Recomendation: 
+
+   ​	dlrm
 
 3. Others Models can also be imported, as long as a input tensor is provided  with the model. Please refer to **Section 4, example** **3** for details.
 
@@ -138,17 +146,28 @@
 
 ​	 	Total counts of memory and computation costs. 
 
-​			Note that  1M = 1024 x 1024, and 1G= 1M x 1024 in this table
+​			Note that  1M = 1024 x 1024 for data  size and 1G = 1E9 for ops counts
 
 #### 	3.1.2. Details sheet:
 
-​		The results are demonstrated at one nn layer per row. The meanings of columns as belows:
+​		The results are demonstrated at one nn layer per row. The meanings of columns as below:
 
 ​		**Layer:**
 
-​			TF Keras: Layer names & Types
+​			**TF Keras**: Layer names & Types
 
-​			Pytorch:  layer names in multi-levels
+​			**Pytorch**:  layer names in multi-levels.  Pytorch models are organized in a nested style. For example，a model may have several sequential/ sub-modules, and each module also have several nn layers.  *The first columns* in the  table demonstrate the hierarchical structures: the layer names in the first columns are at the top level of the model structure, the layer names in second column are at the second level of the model, etc. , as shown below,
+
+```
+       														layer-l0		|	layer_l1	|	layer-l1
+       	├─Sequential: 1-5                                 Sequential:1-5	|				|
+        |    └─Bottleneck: 2-1                           					|Bottleneck:2-1	|
+        |    |    └─Conv2d: 3-1             ==>				     			|				|Conv2d: 3-1
+        |    |    └─BatchNorm2d: 3-2             							|				|BatchNorm2d: 3-2
+        |    |    └─ReLU: 3-3      											|				|ReLU: 3-3
+        
+        Pytoch Model Hierarchy												pytorch table
+```
 
 ​		**Input tensors :**
 

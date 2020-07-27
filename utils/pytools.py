@@ -28,9 +28,19 @@ def modelLst(ucfg):
     if hasattr(models,nnname):
         model = getattr(models, nnname)()
         x = torch.rand(1,3,224,224)
+        y = model(x)        
+        ms=str(summary(model,x, depth=depth,branching=2,verbose=1,ucfg=ucfg))
+            
+    if nnname=='maskrcnn':
+        depth = 6
+        model = models.detection.maskrcnn_resnet50_fpn(pretrained=False)
+        model.eval()
+        x = [torch.rand(3, 1024,1024)]
         y = model(x)
-        shape=(3, 224, 224)
-        ms=str(summary(model,shape, depth=depth,branching=2,verbose=1,ucfg=ucfg))
+        y = y[0]
+        x = [torch.rand(1,3, 1024, 1024)]
+        ms=str(summary(model,(x,), depth=depth,branching=2,verbose=1,ucfg=ucfg))
+
     
     if nnname =='dlrm':
         depth=2
@@ -74,7 +84,7 @@ def modelLst(ucfg):
         else:
             col_names =col_names_noconv
             ms=str(summary(model,inst, col_names=col_names,depth=depth,branching=2,verbose=1,ucfg=ucfg))
-    
+  
     if nnname =='mymodel':
         depth=2
         isconv = False
@@ -148,5 +158,11 @@ def tableExport(ms,nnname,y):
     ft.FormatTable(paraout,maxVal)
     
     if True:
-        outputname='.//outputs//torch//'+nnname
-        dg.graph(y,outputname)
+        if isinstance(y,dict):
+            for k,v in y.items():
+                if v.grad_fn:
+                    outputname ='.//outputs//torch//'+nnname+'_'+k
+                    dg.graph(v,outputname)
+        else:
+            outputname='.//outputs//torch//'+nnname
+            dg.graph(y,outputname)

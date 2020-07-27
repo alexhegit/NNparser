@@ -22,18 +22,17 @@ def SumTable(paraout):
     
     
     maxVal=[['']*3,['']*3]
-    dfmax=df.max()
+   
     # max size
-    maxVal[0][0] = dfmax.SizeO # activation
-    maxVal[0][1] = dfmax.SizeW
+    maxVal[0][0] = df['SizeO'].fillna(0).astype('int64').max() # activation
+    maxVal[0][1] = df['SizeW'].fillna(0).astype('int64').max()
     # max ops 
-    maxVal[1][0] = dfmax.OpGemm
+    maxVal[1][0] = df['OpGemm'].fillna(0).astype('int64').max()
     
-    sumVal = df.sum()
     sumlst = [
-                ['Total Activations(MB):',sumVal.SizeO/(1024**2)],
-                ['Total Weights(MB):',sumVal.SizeW/(1024**2)],
-                ['Total Gemm (G_ops):',sumVal.OpGemm/(1024**3)]
+                ['Total Activations(MB):',df['SizeO'].fillna(0).astype('int64').sum()/(1024**2)],
+                ['Total Weights(MB):',df['SizeW'].fillna(0).astype('int64').sum()/(1024**2)],
+                ['Total Gemm (G_ops):',df['OpGemm'].fillna(0).astype('int64').sum()/(1000**3)]
               ]
     
     if "Summary" in set(workbook.sheetnames):

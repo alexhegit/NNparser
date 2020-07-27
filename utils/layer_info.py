@@ -41,12 +41,23 @@ class LayerInfo:
     # 0614,
     def calculate_input_size(self, inputs: DETECTED_INPUT_TYPES, batch_dim: int) -> None:
         """ Set input_size using the model's inputs. """
+        # if "LastLevelMaxPool" in self.class_name:
+        #     print('multiple input List') #(tensor list,tensor list,list str)
+        # if "MultiScaleRoIAlign" in self.class_name: #AnchorGenerator
+        #     print('ImageList Gen')    
         if isinstance(inputs, (list, tuple)):
             try:
                 self.input_size = list(inputs[0].size())
             except AttributeError:
                 # pack_padded_seq and pad_packed_seq store feature into data attribute
-                size = list(inputs[0].data.size())
+                try:
+                    size = list(inputs[0].data.size())
+                except AttributeError:
+                    if isinstance(inputs[0],list):
+                        size = list(inputs[0][-2].shape)
+                    else:
+                        size = [1,0] #all other casse are blank
+                        # print(self.class_name)
                 self.input_size = size[:batch_dim] + [-1] + size[batch_dim + 1 :]
 
         elif isinstance(inputs, dict):
@@ -66,12 +77,28 @@ class LayerInfo:
             
     def calculate_output_size(self, outputs: DETECTED_OUTPUT_TYPES, batch_dim: int) -> None:
         """ Set output_size using the model's outputs. """
+        # if "LastLevelMaxPool" in self.class_name: 
+        #     print('multiple output Lists') #(tensor list,list str)
+        # if "GeneralizedRCNNTransform" in self.class_name:
+        #     print('ImageList Gen')
         if isinstance(outputs, (list, tuple)):
             try:
                 self.output_size = list(outputs[0].size())
             except AttributeError:
-                # pack_padded_seq and pad_packed_seq store feature into data attribute
-                size = list(outputs[0].data.size())
+                  # pack_padded_seq and pad_packed_seq store feature into data attribute
+                try:
+                    size = list(outputs[0].data.size())
+                except AttributeError:
+                    if isinstance(outputs[0],list):                        
+                        if isinstance(outputs[0][-1],torch.Tensor):
+                            size = list(outputs[0][-1].shape)
+                        elif isinstance(outputs[0][-1],dict): # detection results in rcnn
+                            size = [1, len(outputs[0][-1])]
+                        else:
+                            size = [1,0] #other cases for output[0][0]
+                            print(self.class_name)
+                    else:
+                        size = [1,0] #all other casse are blank
                 self.output_size = size[:batch_dim] + [-1] + size[batch_dim + 1 :]
 
         elif isinstance(outputs, dict):
@@ -102,7 +129,7 @@ class LayerInfo:
                 self.pad_size = list(self.module.padding)
             else: # make a 2 elem list
                 self.pad_size = [self.module.padding,'']
-        
+            
         """ Set num_params using the module's parameters.  """
         for name, param in self.module.named_parameters():
             self.num_params += param.nelement()
@@ -118,7 +145,7 @@ class LayerInfo:
 
                 # ignore N, C when calculate Mult-Adds in ConvNd
                 if "Conv" in self.class_name:
-                    self.macs += int(param.nelement() * np.prod(self.output_size[2:]))
+                    self.macs += (param.nelement() * int(np.prod(self.output_size[2:])))
                 else:
                     self.macs += param.nelement()
             # RNN modules have inner weights such as weight_ih_l0
@@ -130,7 +157,8 @@ class LayerInfo:
                 ub=1
                 
         if "Conv" in self.class_name:
-            self.gemm = int(np.prod(self.output_size[2:]) *np.prod(self.kernel_size))
+            units= int(np.prod(self.output_size[1:]))
+            self.gemm = int(np.prod(self.output_size[2:])) *int(np.prod(self.kernel_size))+units*ub
         if "BatchNorm2d" in self.class_name:
             self.vect = np.prod(self.output_size[1:])*2 #1 elem* 1elem+
         if "ReLU" in self.class_name:
