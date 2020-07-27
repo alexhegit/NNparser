@@ -35,10 +35,10 @@ def modelLst(ucfg):
         depth = 6
         model = models.detection.maskrcnn_resnet50_fpn(pretrained=False)
         model.eval()
-        x = [torch.rand(3, 1024,1024)]
+        x = [torch.rand(3, 800,800)]
         y = model(x)
         y = y[0]
-        x = [torch.rand(1,3, 1024, 1024)]
+        x = [torch.rand(1,3, 800, 800)]
         ms=str(summary(model,(x,), depth=depth,branching=2,verbose=1,ucfg=ucfg))
 
     
@@ -66,10 +66,10 @@ def modelLst(ucfg):
         y = model(x,lS_o,lS_i)
         inst = (x,[lS_o,lS_i])        
         if isconv:
-            ms=str(summary(model,inst, depth=depth,branching=2,verbose=1,device='cpu',ucfg=ucfg))
+            ms=str(summary(model,inst, depth=depth,branching=2,verbose=1,ucfg=ucfg))
         else:
             col_names =col_names_noconv
-            ms=str(summary(model,inst, col_names=col_names, depth=depth,branching=2,verbose=1,device='cpu',ucfg=ucfg))
+            ms=str(summary(model,inst, col_names=col_names, depth=depth,branching=2,verbose=1,ucfg=ucfg))
     
     if nnname =='bert-base-cased':
         isconv = False

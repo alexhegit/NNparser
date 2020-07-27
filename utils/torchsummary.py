@@ -97,8 +97,16 @@ def summary(
         # args list
         if len(input_data)>1:
             inputarg = input_data[1]
-            for arg in inputarg:
-                x.append(arg)
+            if isinstance(inputarg,(tuple,list)):
+                for arg in inputarg:
+                    if isinstance(arg,list):
+                        tmp=[data.to(device) for data in arg]
+                        x.append(tmp)
+                    else:
+                        x.append(arg.to(device))
+            else:
+                x.append(inputarg.to(device))
+                         
     else:
         raise TypeError(
             "Input type is not recognized. Please ensure input_data is valid.\n"

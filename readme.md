@@ -261,7 +261,7 @@ The  tool can parse a new model if one can add the model definition in the codes
 
 1. open the function modellst() in //utils//pytools.py
 
-2. Assume the model name is "mymodel" as shown in line 78
+2. Assume the model name is "mymodel" as shown in line 88
 
 3. Add the model definitions between line "===== To add a customized model ===="  and "===== end of your codes ======"
 
