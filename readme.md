@@ -10,6 +10,8 @@
 
 ## 1. Installation:
 
+It is recommended to install the tool in a virtual environment, explained in [the manual](./docs/virtualenv.md). 
+
 1.1. clone the repository to the local drive. 
 
 1.2. The tool works with :
