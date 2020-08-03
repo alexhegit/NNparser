@@ -109,6 +109,16 @@ def modelLst(ucfg):
         ms=str(summary(model,x, depth=depth,branching=2,verbose=1,ucfg=ucfg))
         
 
+    if nnname =='lstm':
+        depth=2
+        isconv = False
+        from torchmodels.lstm import LSTMNet
+        x=torch.rand(2,1).to(torch.long)
+        model = LSTMNet()
+        y = model(x)
+        col_names =col_names_noconv
+        ms=str(summary(model,x, col_names=col_names,depth=depth,branching=2,verbose=1,ucfg=ucfg))
+
     return ms, depth, isconv,y
 
 # table gen
@@ -163,6 +173,9 @@ def tableExport(ms,nnname,y):
                 if v.grad_fn:
                     outputname ='.//outputs//torch//'+nnname+'_'+k
                     dg.graph(v,outputname)
+        elif len(y)>1:
+            outputname='.//outputs//torch//'+nnname
+            dg.graph(y[0],outputname)
         else:
             outputname='.//outputs//torch//'+nnname
             dg.graph(y,outputname)

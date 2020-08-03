@@ -159,21 +159,24 @@ class LayerInfo:
         if "Conv" in self.class_name:
             units= int(np.prod(self.output_size[1:]))
             self.gemm = int(np.prod(self.output_size[2:])) *int(np.prod(self.kernel_size))+units*ub
-        if "BatchNorm2d" in self.class_name:
+        elif "BatchNorm2d" in self.class_name:
             self.vect = np.prod(self.output_size[1:])*2 #1 elem* 1elem+
-        if "ReLU" in self.class_name:
+        elif "ReLU" in self.class_name:
             self.acti = np.prod(self.output_size[1:])
-        if "MaxPool2d" in self.class_name:
+        elif "MaxPool2d" in self.class_name:
             ksize=self.module.kernel_size
             csize=self.output_size[1]
             self.kernel_size=(csize,csize,ksize,ksize)
             self.vect = np.prod(self.output_size[1:])*(np.prod(self.kernel_size[2:])-1)            
-        if "Linear" in self.class_name:
-            lens = self.input_size[1]
-            units= self.output_size[1]
-            self.gemm = lens*units+ units*ub#1 add 2mac
-        if "Sigmoid" in self.class_name:
+        elif "Linear" in self.class_name:
+            # lens = self.input_size[1]
+            # units= self.output_size[1]
+            #self.gemm = lens*units+ units*ub
+            self.gemm = self.macs
+        elif "Sigmoid" in self.class_name:
             self.acti = self.output_size[1]
+        else:
+            self.gemm = self.macs
         
         for name,aa in self.module.named_children(): 
             self.num_params = 0
