@@ -310,7 +310,25 @@ def GetModel(ucfg):
         token_dict = get_base_dict()
         training = True
         if training:
-            model = get_model(token_num=len(token_dict),embed_dim=1024,head_num=16,training=training)
+            # # bert base
+            # embed_dim=768 # bert small
+            # headnum=12
+            # layernum=12
+            # bert large
+            embed_dim=1024 # bert small
+            headnum=16
+            layernum=24
+            
+            ff_dim=embed_dim*4
+            token_num = 30522 # number of words from paper
+            model = get_model(token_num=token_num,
+                              pos_num=512,
+                              seq_len=512,
+                              embed_dim=embed_dim,
+                              transformer_num= layernum,
+                              head_num=headnum,
+                              feed_forward_dim=ff_dim,
+                              training=training)
         else:
             # Revise lib\site-packages\keras_bert\bert.py: line164
             # "return inputs, transformed" -> "return inputs, transformed,model"
