@@ -160,14 +160,14 @@ class LayerInfo:
             units= int(np.prod(self.output_size[1:]))
             self.gemm = int(np.prod(self.output_size[2:])) *int(np.prod(self.kernel_size))+units*ub
         elif "BatchNorm2d" in self.class_name:
-            self.vect = np.prod(self.output_size[1:])*2 #1 elem* 1elem+
+            self.vect = int(np.prod(self.output_size[1:]))*2 #1 elem* 1elem+
         elif "ReLU" in self.class_name:
-            self.acti = np.prod(self.output_size[1:])
+            self.acti = int(np.prod(self.output_size[1:])）
         elif "MaxPool2d" in self.class_name:
             ksize=self.module.kernel_size
             csize=self.output_size[1]
             self.kernel_size=(csize,csize,ksize,ksize)
-            self.vect = np.prod(self.output_size[1:])*(np.prod(self.kernel_size[2:])-1)            
+            self.vect = int(np.prod(self.output_size[1:]))*int(np.prod(self.kernel_size[2:])-1)            
         elif "Linear" in self.class_name:
             # lens = self.input_size[1]
             # units= self.output_size[1]

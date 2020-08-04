@@ -16,7 +16,7 @@ import argparse
 parser = argparse.ArgumentParser()
 
 parser.add_argument("-n","--nnname", help="Neural Networkto be parsed",
-                    default='ResNet50')
+                    default='bert')
 parser.add_argument("-b","--batchsize", help="Batch Sized",
                     default=1, type=int)
 parser.add_argument("-e","--BPE", help="Byte per element",

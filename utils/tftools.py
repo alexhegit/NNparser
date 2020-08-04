@@ -127,7 +127,7 @@ def getweightsize(x,dataw):
     if len(weights)>0: 
         dataw=0
         for item in weights:
-            dataw += np.prod(item.shape)
+            dataw += int(np.prod(item.shape))
     return dataw
 
 def opscomputation(x,datao,inp0):    
@@ -211,7 +211,7 @@ def opscomputation(x,datao,inp0):
             
         if ltype=='Conv2D':
             ub = 1 if x.use_bias else 0
-            gemm=np.prod(x.kernel_size)*inp0[2]*datao+x.output_shape[3]*ub
+            gemm=int(np.prod(x.kernel_size))*inp0[2]*datao+x.output_shape[3]*ub
             
         if ltype== 'GlobalAveragePooling2D':
             vect=datao*(inp0[0]*inp0[1]-1) #add op
@@ -221,10 +221,10 @@ def opscomputation(x,datao,inp0):
         
         if ltype=='DepthwiseConv2D':
             ub = 1 if x.use_bias else 0
-            gemm=np.prod(x.kernel_size)*datao+x.output_shape[3]*ub
+            gemm=int(np.prod(x.kernel_size))*datao+x.output_shape[3]*ub
         
         if ltype=='MaxPooling2D':
-            vect=datao*(np.prod(x.pool_size)-1) #max op
+            vect=datao*int((np.prod(x.pool_size)-1)) #max op
     return gemm,vect,acti
 
 def pararetrival(x):
