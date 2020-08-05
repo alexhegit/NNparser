@@ -162,7 +162,7 @@ class LayerInfo:
         elif "BatchNorm2d" in self.class_name:
             self.vect = int(np.prod(self.output_size[1:]))*2 #1 elem* 1elem+
         elif "ReLU" in self.class_name:
-            self.acti = int(np.prod(self.output_size[1:])）
+            self.acti = int(np.prod(self.output_size[1:]))
         elif "MaxPool2d" in self.class_name:
             ksize=self.module.kernel_size
             csize=self.output_size[1]

@@ -30,8 +30,8 @@ def SumTable(paraout):
     maxVal[1][0] = df['OpGemm'].fillna(0).astype('int64').max()
     
     sumlst = [
-                ['Total Activations(MB):',df['SizeO'].fillna(0).astype('int64').sum()/(1024**2)],
-                ['Total Weights(MB):',df['SizeW'].fillna(0).astype('int64').sum()/(1024**2)],
+                ['Total Activations(MB):',df['SizeO'].fillna(0).astype('int64').sum()/(1000**2)],
+                ['Total Weights(MB):',df['SizeW'].fillna(0).astype('int64').sum()/(1000**2)],
                 ['Total Gemm (G_ops):',df['OpGemm'].fillna(0).astype('int64').sum()/(1000**3)]
               ]
     
