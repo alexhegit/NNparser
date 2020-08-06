@@ -116,9 +116,19 @@ def modelLst(ucfg):
         x=torch.rand(2,1).to(torch.long)
         model = LSTMNet()
         y = model(x)
-        col_names =col_names_noconv
+        col_names =("input_size","output_size", "num_in","num_out","num_params","gemm","vect","acti")
         ms=str(summary(model,x, col_names=col_names,depth=depth,branching=2,verbose=1,ucfg=ucfg))
-
+        
+    if nnname =='gru':
+        depth=2
+        isconv = False
+        from torchmodels.gru import GRUNet
+        x=torch.rand(2,1).to(torch.long)
+        model = GRUNet()
+        y = model(x)
+        col_names =("input_size","output_size", "num_in","num_out","num_params","gemm","vect","acti")
+        ms=str(summary(model,x, col_names=col_names,depth=depth,branching=2,verbose=1,ucfg=ucfg))
+        
     return ms, depth, isconv,y
 
 # table gen

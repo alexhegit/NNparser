@@ -175,6 +175,12 @@ class LayerInfo:
             self.gemm = self.macs
         elif "Sigmoid" in self.class_name:
             self.acti = self.output_size[1]
+        elif "LSTM" in self.class_name:
+            self.acti = self.module.num_layers*self.module.hidden_size*5
+            self.gemm = self.macs+8*self.module.num_layers*self.module.hidden_size
+        elif "RNN" in self.class_name:
+            self.acti = self.module.num_layers*self.module.hidden_size*3
+            self.gemm = self.macs+8*self.module.num_layers*self.module.hidden_size
         else:
             self.gemm = self.macs
         

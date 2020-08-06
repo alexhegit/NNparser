@@ -84,7 +84,9 @@ It is recommended to install the tool in a virtual environment, explained in [th
 
    ​	dlrm
 
-3. lstm
+3. RNN network: 
+
+   - base: lstm, gru
 
 4. Others Models can also be imported, as long as a input tensor is provided  with the model. Please refer to **Section 4, example** **3** for details.
 
