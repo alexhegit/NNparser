@@ -13,10 +13,12 @@ import utils.pytools as pt
 # 2. Recomendation:
 #    dlrm
 
+# 3. Detection: maskrcnn, ssd_mobilenet
+
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-n","--nnname", help="Neural Network to be parsed",
-                    default='resnet50')
+                    default='ssd_mobilenet')
 parser.add_argument("-b","--batchsize", help="Batch Sized",
                     default=1, type=int)
 parser.add_argument("-e","--BPE", help="Byte per element",

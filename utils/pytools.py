@@ -129,6 +129,16 @@ def modelLst(ucfg):
         col_names =("input_size","output_size", "num_in","num_out","num_params","gemm","vect","acti")
         ms=str(summary(model,x, col_names=col_names,depth=depth,branching=2,verbose=1,ucfg=ucfg))
         
+    if nnname == 'ssd_mobilenet':
+        depth = 4
+        from torchmodels.ssdmobilenet.ssd_mobilenet_v1 import create_mobilenetv1_ssd
+        model = create_mobilenetv1_ssd(10)
+        model.eval()
+        image = torch.rand(1,3,300,300)*255
+        y = model(image)
+        x = [torch.rand(1,3, 300, 300)]
+        ms=str(summary(model,(x,), depth=depth,branching=2,verbose=1,ucfg=ucfg))
+        
     return ms, depth, isconv,y
 
 # table gen
@@ -183,9 +193,15 @@ def tableExport(ms,nnname,y):
                 if v.grad_fn:
                     outputname ='.//outputs//torch//'+nnname+'_'+k
                     dg.graph(v,outputname)
+        elif 'ssd' in nnname :
+            yname = ('scores','boxes' )
+            for v,name in zip(y,yname):
+               outputname ='.//outputs//torch//'+nnname+'_'+name
+               dg.graph(v,outputname)
         elif len(y)>1:
             outputname='.//outputs//torch//'+nnname
             dg.graph(y[0],outputname)
+        
         else:
             outputname='.//outputs//torch//'+nnname
             dg.graph(y,outputname)
