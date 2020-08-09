@@ -130,8 +130,8 @@ def modelLst(ucfg):
         ms=str(summary(model,x, col_names=col_names,depth=depth,branching=2,verbose=1,ucfg=ucfg))
         
     if nnname == 'ssd_mobilenet':
-        depth = 2
-        branching=0
+        depth = 5
+        branching=2
         from torchmodels.ssdmobilenet.ssd_mobilenet_v1 import create_mobilenetv1_ssd
         model = create_mobilenetv1_ssd(10)
         model.eval()
@@ -165,10 +165,6 @@ def modelLst(ucfg):
 # table gen
 def tableGen(ms,depth,isconv):
     # produce table text lst
-    # if depth==0:
-    #     header = 'layer'
-    # else:
-    #     header = 'layer' + ','*(depth)
     header=''
     if depth ==0:
         header='layer,'

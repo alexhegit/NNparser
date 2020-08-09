@@ -80,6 +80,7 @@ class ModelStatistics:
             "vect": layer_info.vect if layer_info.vect else [''],
             "acti":layer_info.acti if layer_info.acti else [''],
         }  #0615: list instead of string
+
         depth = layer_info.depth
         if self.formatting.use_branching==1: # 0615:for 3 cases
             name = get_start_str(depth) + str(layer_info) 
@@ -87,8 +88,6 @@ class ModelStatistics:
             name = get_start_comma(depth) + str(layer_info) + "," * (self.formatting.max_depth-depth)
         else:
             name ='' + str(layer_info)# 0615
-        # if name.find('Linear')>=0:
-        #     print(name)
         new_line = self.formatting.format_row(name, row_values)
         if self.formatting.verbose == Verbosity.VERBOSE.value:
             for inner_name, inner_shape in layer_info.inner_layers.items():
@@ -100,8 +99,13 @@ class ModelStatistics:
     def layers_to_str(self) -> str:
         """ Print each layer of the model as tree or as a list. """
         if self.formatting.use_branching:
-            return self._layer_tree_to_str()
-
+            lines = self._layer_tree_to_str()
+            lincnt = lines.count('\n')
+            # to handle ModuleList
+            if lincnt < len(self.summary_list):
+                lines += self._layer_tree_to_str(lincnt, len(self.summary_list),2)
+            return lines
+        
         layer_rows = ""
         for layer_info in self.summary_list:
             layer_rows += self.layer_info_to_row(layer_info)
@@ -111,14 +115,15 @@ class ModelStatistics:
         """ Print each layer of the model using a fancy branching diagram. """
         if depth > self.formatting.max_depth:
             return ""
+
         new_left = left - 1
         new_str = ""
         if right is None:
             right = len(self.summary_list)
         for i in range(left, right):
             layer_info = self.summary_list[i]
-            #print(depth,layer_info.depth)
             if layer_info.depth == depth:
+                # print(i,left,right)
                 reached_max_depth = depth == self.formatting.max_depth
                 new_str += self.layer_info_to_row(layer_info, reached_max_depth)
                 new_str += self._layer_tree_to_str(new_left + 1, i, depth + 1)
