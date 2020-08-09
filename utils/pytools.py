@@ -130,14 +130,17 @@ def modelLst(ucfg):
         ms=str(summary(model,x, col_names=col_names,depth=depth,branching=2,verbose=1,ucfg=ucfg))
         
     if nnname == 'ssd_mobilenet':
-        depth = 4
+        depth = 2
+        branching=0
         from torchmodels.ssdmobilenet.ssd_mobilenet_v1 import create_mobilenetv1_ssd
         model = create_mobilenetv1_ssd(10)
         model.eval()
         image = torch.rand(1,3,300,300)*255
         y = model(image)
         x = [torch.rand(1,3, 300, 300)]
-        ms=str(summary(model,(x,), depth=depth,branching=2,verbose=1,ucfg=ucfg))
+        ms=str(summary(model,(x,), depth=depth,branching=branching,verbose=1,ucfg=ucfg))
+        if branching==0:
+            depth=0
         
     if nnname == 'gnmt':
         depth = 4
@@ -162,10 +165,16 @@ def modelLst(ucfg):
 # table gen
 def tableGen(ms,depth,isconv):
     # produce table text lst
-    header = 'layer' + ','*(depth)
+    # if depth==0:
+    #     header = 'layer'
+    # else:
+    #     header = 'layer' + ','*(depth)
     header=''
-    for i in range(depth):
-        header += 'layer_l{},'.format(i)
+    if depth ==0:
+        header='layer,'
+    else:
+        for i in range(depth):
+            header += 'layer_l{},'.format(i)
         
     if isconv:
         header += 'I1,I2,I3,' # input: cinxhxw; multiple input in model statistics

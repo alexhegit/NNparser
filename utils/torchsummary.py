@@ -219,7 +219,6 @@ def apply_hooks(
 
     def hook(module: nn.Module, inputs: Any, outputs: Any) -> None:
         """ Create a LayerInfo object to aggregate information about that layer. """
-        #del inputs  #0614
         idx[curr_depth] = idx.get(curr_depth, 0) + 1
         info = LayerInfo(module, curr_depth, idx[curr_depth])
         info.calculate_input_size(inputs, batch_dim)   #0614
@@ -229,8 +228,10 @@ def apply_hooks(
         info.check_recursive(summary_list)
         summary_list.append(info)
 
-    # ignore Sequential and ModuleList and other containers
+    # if 'ModuleList' in str(type(module)):
+    #     print(module._get_name())
     submodules = [m for m in module.modules() if m is not orig_model]
+
     if module != orig_model or isinstance(module, LAYER_MODULES) or not submodules:
         hooks.append(module.register_forward_hook(hook))
 
