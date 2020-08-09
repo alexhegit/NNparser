@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+"""
+Created on Mon Jul  5  2020
+
+@author: LL
+"""
 import utils.pytools as pt
 
 # Tested Models
@@ -14,11 +19,13 @@ import utils.pytools as pt
 #    dlrm
 
 # 3. Detection: maskrcnn, ssd_mobilenet
+# 4. RNN: lstm,gru
+# 5. NLP: gnmt
 
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-n","--nnname", help="Neural Network to be parsed",
-                    default='ssd_mobilenet')
+                    default='gnmt')
 parser.add_argument("-b","--batchsize", help="Batch Sized",
                     default=1, type=int)
 parser.add_argument("-e","--BPE", help="Byte per element",

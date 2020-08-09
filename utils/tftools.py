@@ -136,11 +136,11 @@ def opscomputation(x,datao,inp0):
     if ltype:
         if ltype=='BatchNormalization': # BN
             vect = datao*2 #1 elem* 1elem+
-        if ltype=='Add': #add layer
+        elif ltype=='Add': #add layer
             vect = datao # output tensor size
-        if ltype=='LayerNormalization': #add layer
+        elif ltype=='LayerNormalization': #add layer
             acti = datao # output tensor size
-        if ltype=='MultiHeadAttention': #attentio layer
+        elif ltype=='MultiHeadAttention': #attentio layer
             head = x.head_num
             seqlen,emblen = inp0[:2]
             keylen =emblen//head # feature_dim
@@ -176,7 +176,7 @@ def opscomputation(x,datao,inp0):
             
 
             
-        if ltype=='LayerNormalization': #attentio layer
+        elif ltype=='LayerNormalization': #attentio layer
             seqlen,emblen = inp0[:2]
             vect=0; acti=0
             #  along last dim, emb dim
@@ -190,7 +190,7 @@ def opscomputation(x,datao,inp0):
             # output:( x-mx)/std
             vect += (seqlen*2)
         
-        if ltype=='FeedForward': #attentio layer
+        elif ltype=='FeedForward': #attentio layer
             seqlen,emblen = inp0[:2]
             units=x.units
             gemm=0; acti=0
@@ -202,29 +202,37 @@ def opscomputation(x,datao,inp0):
             gemm += seqlen*units*emblen +seqlen*emblen*ub
             acti += seqlen*emblen
         
-        if ltype=='Dense':
+        elif ltype=='Dense':
             lens = x.input_shape[1]
             ub = 1 if x.use_bias else 0
             units=x.units
             gemm = lens*units+ units*ub#1 add 2mac
             acti = lens*ub
             
-        if ltype=='Conv2D':
+        elif ltype=='Conv2D':
             ub = 1 if x.use_bias else 0
             gemm=int(np.prod(x.kernel_size))*inp0[2]*datao+x.output_shape[3]*ub
             
-        if ltype== 'GlobalAveragePooling2D':
+        elif ltype== 'GlobalAveragePooling2D':
             vect=datao*(inp0[0]*inp0[1]-1) #add op
             
-        if ltype=='Activation':
+        elif ltype=='Activation':
             acti = datao  #activation functions
         
-        if ltype=='DepthwiseConv2D':
+        elif ltype=='DepthwiseConv2D':
             ub = 1 if x.use_bias else 0
             gemm=int(np.prod(x.kernel_size))*datao+x.output_shape[3]*ub
         
-        if ltype=='MaxPooling2D':
+        elif ltype=='MaxPooling2D':
             vect=datao*int((np.prod(x.pool_size)-1)) #max op
+        
+        else:
+            weights=x.get_weights()
+            if len(weights)>0: 
+                gemm=0
+                for item in weights:
+                    gemm += int(np.prod(item.shape))
+        
     return gemm,vect,acti
 
 def pararetrival(x):
@@ -393,13 +401,6 @@ def ListGen(model,isconv,ucfg):
         # conv tensor
         (kh, kw, sh, sw, ph, pw) = pararetrival(x)
        
-        xtype=str(type(x))
-        if xtype.find('Embedding')>0:
-            # todo: inputdim??
-            vocalsize = inp0[0]
-            embsize = out[0]
-            seqlen = inp0[0]
-         
         # if isinstance(x, keras.layers.Lambda):
         #     print('')
         datai = datai*bs

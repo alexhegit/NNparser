@@ -167,8 +167,8 @@ It is recommended to install the tool in a virtual environment, explained in [th
 ​			**Pytorch**:  layer names in multi-levels.  Pytorch models are organized in a nested style. For example，a model may have several sequential/ sub-modules, and each module also have several nn layers.  *The first columns* in the  table demonstrate the hierarchical structures: the layer names in the first columns are at the top level of the model structure, the layer names in second column are at the second level of the model, etc. , as shown below,
 
 ```
-       														layer-l0		|	layer_l1	|	layer-l1
-       	├─Sequential: 1-5                                 Sequential:1-5	|				|
+                                                            layer-l0		|	layer_l1	|	layer-l1
+       	├─Sequential: 1-5                                  Sequential:1-5	|				|
         |    └─Bottleneck: 2-1                           					|Bottleneck:2-1	|
         |    |    └─Conv2d: 3-1             ==>				     			|				|Conv2d: 3-1
         |    |    └─BatchNorm2d: 3-2             							|				|BatchNorm2d: 3-2

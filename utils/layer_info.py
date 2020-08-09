@@ -181,13 +181,14 @@ class LayerInfo:
         elif "RNN" in self.class_name:
             self.acti = self.module.num_layers*self.module.hidden_size*3
             self.gemm = self.macs+8*self.module.num_layers*self.module.hidden_size
-        #else:
-        #    self.gemm = self.macs
+        else:
+            self.gemm = self.macs
         
         for name,aa in self.module.named_children(): 
             self.num_params = 0
             self.input_size = [0]*4
             self.output_size = [0]*4
+            self.gemm = 0
             #print(self.class_name)
             break
            

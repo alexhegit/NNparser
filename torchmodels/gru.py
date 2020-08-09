@@ -2,7 +2,7 @@
 """
 Created on Mon Aug  3 12:52:15 2020
 
-@author: E00058
+@author: LL
 """
 from torch import nn
 

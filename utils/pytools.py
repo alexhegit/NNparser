@@ -2,7 +2,7 @@
 """
 Created on Thu Jul 16 11:47:13 2020
 
-@author: sts
+@author: LL
 """
 
 import torch
@@ -138,6 +138,24 @@ def modelLst(ucfg):
         y = model(image)
         x = [torch.rand(1,3, 300, 300)]
         ms=str(summary(model,(x,), depth=depth,branching=2,verbose=1,ucfg=ucfg))
+        
+    if nnname == 'gnmt':
+        depth = 4
+        isconv = False
+        col_names =col_names_noconv
+        from torchmodels.seq2seq.models.gnmt import GNMT
+        model_config = {'hidden_size': 1024,
+                    'num_layers': 4,
+                    'dropout': 0.2, 'batch_first': True,
+                    'share_embedding': True}
+        model = GNMT(vocab_size=2048, **model_config)
+        model.eval()
+        seqlen=1
+        batch=2
+        x=torch.rand(batch,seqlen).to(torch.long)
+        srclen=torch.ones(batch).to(torch.long)*seqlen
+        y=model(x,srclen,x)
+        ms=str(summary(model,([x,srclen,x],), col_names=col_names,depth=depth,branching=2,verbose=1,ucfg=ucfg))
         
     return ms, depth, isconv,y
 
