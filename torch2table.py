@@ -18,7 +18,7 @@ import utils.pytools as pt
 # 2. Recomendation:
 #    dlrm
 
-# 3. Detection: maskrcnn, ssd_mobilenet
+# 3. Detection: maskrcnn, ssd_mobilenet, ssd_r34
 # 4. RNN: lstm,gru
 # 5. NLP: gnmt
 

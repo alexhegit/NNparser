@@ -130,17 +130,26 @@ def modelLst(ucfg):
         ms=str(summary(model,x, col_names=col_names,depth=depth,branching=2,verbose=1,ucfg=ucfg))
         
     if nnname == 'ssd_mobilenet':
-        depth = 5
+        depth = 3
         branching=2
-        from torchmodels.ssdmobilenet.ssd_mobilenet_v1 import create_mobilenetv1_ssd
-        model = create_mobilenetv1_ssd(10)
+        from torchmodels.ssd.ssd_mobilenet_v1 import create_mobilenetv1_ssd
+        model = create_mobilenetv1_ssd(81)
         model.eval()
-        image = torch.rand(1,3,300,300)*255
-        y = model(image)
-        x = [torch.rand(1,3, 300, 300)]
+        x = torch.rand(1,3, 300, 300)
+        y = model(x)
         ms=str(summary(model,(x,), depth=depth,branching=branching,verbose=1,ucfg=ucfg))
         if branching==0:
             depth=0
+            
+    if nnname == 'ssd_r34':
+        depth = 3
+        branching=2
+        from torchmodels.ssd.ssd_r34 import SSD_R34
+        model = SSD_R34()
+        model.eval()
+        x = torch.rand(1,3,1200,1200)
+        y = model(x)
+        ms=str(summary(model,(x,), depth=depth,branching=branching,verbose=1,ucfg=ucfg))
         
     if nnname == 'gnmt':
         depth = 4
@@ -216,11 +225,17 @@ def tableExport(ms,nnname,y):
                 if v.grad_fn:
                     outputname ='.//outputs//torch//'+nnname+'_'+k
                     dg.graph(v,outputname)
-        elif 'ssd' in nnname :
+        elif 'ssd_mo' in nnname :
             yname = ('scores','boxes' )
             for v,name in zip(y,yname):
                outputname ='.//outputs//torch//'+nnname+'_'+name
                dg.graph(v,outputname)
+        elif 'ssd_r' in nnname :
+            yname = ('boxes','label','scores' )
+            for v,name in zip(y,yname):
+                if v[0].grad_fn:
+                   outputname ='.//outputs//torch//'+nnname+'_'+name
+                   dg.graph(v[0],outputname)
         elif len(y)>1:
             outputname='.//outputs//torch//'+nnname
             dg.graph(y[0],outputname)
