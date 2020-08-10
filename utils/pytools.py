@@ -133,7 +133,7 @@ def modelLst(ucfg):
         depth = 3
         branching=2
         from torchmodels.ssd.ssd_mobilenet_v1 import create_mobilenetv1_ssd
-        model = create_mobilenetv1_ssd(81)
+        model = create_mobilenetv1_ssd(91)
         model.eval()
         x = torch.rand(1,3, 300, 300)
         y = model(x)
@@ -142,7 +142,7 @@ def modelLst(ucfg):
             depth=0
             
     if nnname == 'ssd_r34':
-        depth = 3
+        depth = 6
         branching=2
         from torchmodels.ssd.ssd_r34 import SSD_R34
         model = SSD_R34()
