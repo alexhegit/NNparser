@@ -169,6 +169,19 @@ def modelLst(ucfg):
         y=model(x,srclen,x)
         ms=str(summary(model,([x,srclen,x],), col_names=col_names,depth=depth,branching=2,verbose=1,ucfg=ucfg))
         
+    if nnname == 'crnn':
+        depth = 6
+        # import sys
+        # sys.path.append('D:\\ll\\github\\OCR\\crnnp')
+        # from model.crnn import CRNN
+        from torchmodels.crnn import CRNN
+        model = CRNN(32, 1, 37, 256)
+        x = torch.rand(1,1,32,100)
+        model.eval()
+        y = model(x)
+        ms=str(summary(model,(x,), depth=depth,branching=2,verbose=1,ucfg=ucfg))
+        # sys.path.remove('D:\\ll\\github\\OCR\\crnnp')
+        
     return ms, depth, isconv,y
 
 # table gen
@@ -236,10 +249,11 @@ def tableExport(ms,nnname,y):
                 if v[0].grad_fn:
                    outputname ='.//outputs//torch//'+nnname+'_'+name
                    dg.graph(v[0],outputname)
-        elif len(y)>1:
-            outputname='.//outputs//torch//'+nnname
-            dg.graph(y[0],outputname)
-        
-        else:
-            outputname='.//outputs//torch//'+nnname
-            dg.graph(y,outputname)
+        elif 'crnn' == nnname:
+            print()  # try: except CalledProcessError:
+        else: # general case, plot using the first output
+            v=y[0]
+            if isinstance(v[0],torch.Tensor):
+                if v[0].grad_fn:
+                       outputname ='.//outputs//torch//'+nnname
+                       dg.graph(v[0],outputname)     
