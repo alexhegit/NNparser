@@ -6,10 +6,10 @@ Created on Thu Jul 16 11:47:13 2020
 """
 
 import torch
-from utils.torchsummary import summary
+from nnutils.torchsummary import summary
 # from torch.autograd import Variable
-import utils.formattable as ft
-import utils.dotGen as dg
+import nnutils.formattable as ft
+import nnutils.dotGen as dg
 from torchvision import models
 import  pandas as pd
 
@@ -17,13 +17,24 @@ def modelLst(ucfg):
     ''' ucfg: user's Config for the table output: nnname, BS, BPE '''
     
     nnname = ucfg['nnname']
+    
     # produce config list of models per layer of the given nn model name
     isconv = True
     depth = 4
     col_names_noconv=("input_size","output_size", "num_in","num_out","num_params","gemm","vect","acti")
-    #two type of inputs in () 
-    # real instances： real example in tensor format: () for multi-data,[] for args
-    # shapes: tuple of shape, to produce random-value inputs; () for data,[] for args; 
+   
+
+    if nnname == 'newmodel':
+        import sys
+        sys.path.append("..")
+        from newmodel import pymodel
+        x,model,depth, isconv,y = pymodel()
+        if isconv:
+            ms=str(summary(model,x, depth=depth,branching=2,verbose=1,ucfg=ucfg))
+        else:
+            ms=str(summary(model,x, col_names=col_names_noconv, depth=depth,branching=2,verbose=1,ucfg=ucfg))
+        sys.path.remove("..")
+        
     # vision models in torchvision
     if hasattr(models,nnname):
         model = getattr(models, nnname)()
@@ -146,7 +157,7 @@ def modelLst(ucfg):
         branching=2
         from torchmodels.ssd.ssd_r34 import SSD_R34
         model = SSD_R34()
-        model.eval()
+        #model.eval()
         x = torch.rand(1,3,1200,1200)
         y = model(x)
         ms=str(summary(model,(x,), depth=depth,branching=branching,verbose=1,ucfg=ucfg))
@@ -171,16 +182,13 @@ def modelLst(ucfg):
         
     if nnname == 'crnn':
         depth = 6
-        # import sys
-        # sys.path.append('D:\\ll\\github\\OCR\\crnnp')
-        # from model.crnn import CRNN
         from torchmodels.crnn import CRNN
         model = CRNN(32, 1, 37, 256)
         x = torch.rand(1,1,32,100)
         model.eval()
         y = model(x)
         ms=str(summary(model,(x,), depth=depth,branching=2,verbose=1,ucfg=ucfg))
-        # sys.path.remove('D:\\ll\\github\\OCR\\crnnp')
+
         
     return ms, depth, isconv,y
 
@@ -256,4 +264,7 @@ def tableExport(ms,nnname,y):
             if isinstance(v[0],torch.Tensor):
                 if v[0].grad_fn:
                        outputname ='.//outputs//torch//'+nnname
-                       dg.graph(v[0],outputname)     
+                       try:
+                           dg.graph(v[0],outputname)
+                       except :
+                           print('Failed to generate model Graph')

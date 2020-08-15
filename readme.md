@@ -87,6 +87,7 @@ It is recommended to install the tool in a virtual environment, explained in [th
 3. RNN network: 
 
    - base: lstm, gru
+   - gnmt
 
 4.  one stage detection: ssd_mobilenet, ssd_r34
 
@@ -235,7 +236,45 @@ It is recommended to install the tool in a virtual environment, explained in [th
 
 
 
-## 4. Advances
+## 4. Add your own model
+
+​	One can simply leverage the API in 'newmodel.py' in the root to analyze any customized models, as long as the models are built-up and ready for test. 
+
+​	There are two major steps for a new model:  1 set the  model info ; 2 execute the main parser codes. 
+
+#### 4.1 pytorch
+
+##### 	a. Set the model info
+
+​		To parse the nn model, all required configures should be provided in function 'pymodel()' in 'newmodel.py'.
+
+​		- model_path: the absolute path which contains the 'model_file'
+
+​		- load model:     from 'model_file' import 'your_model'
+
+​									model = your_model(args)    # args: parameters of your model
+
+​		- define inputs of the mode:  x = torch.rand(1,3, 300, 300)   #  tensor in (BCHW) format
+
+​						you may define the input tensors for the customized model.  Multiple inputs are formated as a list of tensors, as shown in the demo.
+
+#####   b. execute the parser
+
+​	 type the command as the following format to get the results:
+
+​				`python torch2table.py -n newmodel  --model your_model`
+
+  The optional argument --model is to get the model name. If the no model name provided, the results of the model will be saved as ' newmodel.xlsx' in the outputs folder.
+
+### 4.2 keras-tf
+
+​	The operations for Keras model are similar to pytorch model: 1 set the model configs. in 'tfmodel()' in 'newmodel.py' ; 2 execute command 
+
+​				`python keras2table.py -n newmodel  --model your_model`
+
+
+
+## 5. Advances
 
 ​	One can further analyze the various configures of a NN models by changing default settings in the codes. Two examples are shown below.   
 
@@ -263,57 +302,7 @@ It is recommended to install the tool in a virtual environment, explained in [th
 
 
 
-### Example 3: Add a new model 
-
-The  tool can parse a new model if one can add the model definition in the codes.  Steps to add a *pytorch* model  are shown below:
-
-1. open the function modellst() in //utils//pytools.py
-
-2. Assume the model name is "mymodel" as shown in line 88
-
-3. Add the model definitions between line "===== To add a customized model ===="  and "===== end of your codes ======"
-
-   A simple example for [pytorch tutoria](https://pytorch.org/tutorials/beginner/pytorch_with_examples.html)l is listed between these two lines. It can be easily replaced by other model definitions:
-
-   - Define a random input tensor for the model    
-
-     ​      `x = torch.randn(N, D_in)`
-
-   - Get the model definition. 
-
-     ​      `N, D_in, H, D_out = 64, 1000, 100, 10`
-
-     ​      `model = torch.nn.Sequential(`
-
-     ​      `torch.nn.Linear(D_in, H),`
-
-     ​      `torch.nn.ReLU(),`
-
-     ​      `torch.nn.Linear(H, D_out),`
-
-     ​    `)`
-
-     Instead of definition in the scripts, a predefined model can also be imported, 
-
-      	 `model = predefinedModel(...)`
-
-4. save the revised codes
-
-5. in cmd window, type the command:
-
-   ​	`python keras2table.py -n mymodel`
-
-6. the corresponded graph and table will be exported into "//outputs//pytorch"
-
-   
-
-Steps to add a *keras* model are similar. Please refer to line 321-344 in GetModel() at [utils//tftools.py](./utils/tftools.py) for details.
-
-
-
-Please note that special network structures and customized operators may not be supported by the tool. Feel free to join us to extend the functions of the tool.
-
-
+​	Please note that special network structures and customized operators may not be supported by the tool. Feel free to join us to extend the functions of the tool.
 
 ### References:
 

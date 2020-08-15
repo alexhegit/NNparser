@@ -4,7 +4,7 @@ Created on Mon Jul  5  2020
 
 @author: LL
 """
-import utils.pytools as pt
+import nnutils.pytools as pt
 
 # Tested Models
 # 1. torchvision: 
@@ -25,11 +25,13 @@ import utils.pytools as pt
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-n","--nnname", help="Neural Network to be parsed",
-                    default='crnn')
+                    default='resnet18')
 parser.add_argument("-b","--batchsize", help="Batch Sized",
                     default=1, type=int)
 parser.add_argument("-e","--BPE", help="Byte per element",
                     default=1, type=int)
+parser.add_argument("--model", help="name of new model",
+                    default='ssd_mob', type=str)
 args = parser.parse_args()
 
 
@@ -38,5 +40,9 @@ args = parser.parse_args()
 ms = pt.tableGen(ms,depth,isconv)
 
 # exporting the table at //output//torch//
-nnname = args.nnname
+if args.nnname == 'newmodel':
+    nnname = args.model
+else:
+    nnname = args.nnname
+    
 pt.tableExport(ms,nnname,y)

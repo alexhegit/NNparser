@@ -4,7 +4,7 @@ Created on Mon Jul  1 2020
 
 @author: LL
 """
-import utils.tftools as tt
+import nnutils.tftools as tt
 # tested models
     # 1. keras pretrianed models: 
         # 'DenseNet121',  'DenseNet169',  'DenseNet201',
@@ -22,11 +22,13 @@ import argparse
 parser = argparse.ArgumentParser()
 
 parser.add_argument("-n","--nnname", help="Neural Networkto be parsed",
-                    default='bert')
+                    default='VGG19')
 parser.add_argument("-b","--batchsize", help="Batch Sized",
                     default=1, type=int)
 parser.add_argument("-e","--BPE", help="Byte per element",
                     default=1, type=int)
+parser.add_argument("--model", help="name of new model",
+                    default='simpleconv', type=str)
 args = parser.parse_args()
 
 (model,isconv) = tt.GetModel(vars(args)) 
@@ -35,5 +37,8 @@ args = parser.parse_args()
 paralist = tt.ListGen(model,isconv,vars(args)) 
     
 # exproting tables to //outputs//tf
-nnname = args.nnname
+if args.nnname == 'newmodel':
+    nnname = args.model
+else:
+    nnname = args.nnname
 tt.tableExport(paralist,nnname)

@@ -162,7 +162,6 @@ def get_input_tensor(
                 continue
             else:
                 input_tensor = torch.randint(0,1,size) # for DLRM only
-                #input_tensor = torch.rand(*size) # for DLRM only
                 result = input_tensor.to(device).type(torch.long)
                 x.append(result)
                 continue

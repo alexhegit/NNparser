@@ -7,7 +7,7 @@ Created on Mon Jul  6 10:33:46 2020
 import tensorflow.keras as keras
 import numpy as np
 import  pandas as pd
-import utils.formattable as ft
+import nnutils.formattable as ft
 
 
 def headgen(isconv):
@@ -286,9 +286,15 @@ def GetModel(ucfg):
     
     nnname = ucfg['nnname']
     isconv = True
+    
+    if nnname == 'newmodel':
+        import sys
+        sys.path.append("..")
+        from newmodel import tfmodel
+        model,isconv = tfmodel()
+        sys.path.remove("..")
 
-    import tensorflow.keras.applications as nn
- 
+    import tensorflow.keras.applications as nn 
     if hasattr(nn,nnname):
         model = getattr(nn, nnname)(weights=None)
         
@@ -371,8 +377,9 @@ def GetModel(ucfg):
     
     if True:
         g = keras.utils.model_to_dot(model,show_shapes=True)
+        if nnname =='newmodel':
+            nnname = ucfg['model']
         g.write_pdf(".//outputs//tf//"+nnname+'.pdf')
-        # keras.utils.plot_model(model,".//outputs//tf//"+nnname+'.pdf',show_shapes=True)
     return model,isconv
 
 def ListGen(model,isconv,ucfg):
@@ -386,9 +393,6 @@ def ListGen(model,isconv,ucfg):
         datai=''; datao=''; dataw=''
         gemm=''; vect='' ; acti =''
         ltype = str(type(x)).split(".")[-1].split("'")[0]
-        # if x.name=='Encoder-1-FeedForward':
-        #     print(x.name)
-        #print(x.name)
         
         # input tensor & size
         (inp0, inp1, datai, extin) = inputgen(x,inp0,inp1,extin)
