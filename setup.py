@@ -8,7 +8,7 @@ setup(
     # Needed for dependencies
     install_requires=['numpy','pandas','matplotlib','openpyxl','scikit-learn',
     'scikit-image',	'graphviz','python-graphviz','pydot'],
-    version='0.1',
+    version='0.5',
     license='MIT',
     description='The tool was built for AI hardware/ software architectures'
      ' to quickly understand and analyze the overall and layer-wise structure '

@@ -254,7 +254,7 @@ It is recommended to install the tool in a virtual environment, explained in [th
 
 ​									model = your_model(args)    # args: parameters of your model
 
-​		- define inputs of the mode:  x = torch.rand(1,3, 300, 300)   #  tensor in (BCHW) format
+​		- define inputs of the model:  x = torch.rand(1,3, 300, 300)   #  tensor in (BCHW) format
 
 ​						you may define the input tensors for the customized model.  Multiple inputs are formated as a list of tensors, as shown in the demo.
 
@@ -268,7 +268,11 @@ It is recommended to install the tool in a virtual environment, explained in [th
 
 ### 4.2 keras-tf
 
-​	The operations for Keras model are similar to pytorch model: 1 set the model configs. in 'tfmodel()' in 'newmodel.py' ; 2 execute command 
+​	The operations for Keras model are similar to pytorch model: 
+
+​		1 set the model configs. in 'tfmodel()' in 'newmodel.py' ; 
+
+​		2 execute command 
 
 ​				`python keras2table.py -n newmodel  --model your_model`
 
@@ -284,7 +288,7 @@ It is recommended to install the tool in a virtual environment, explained in [th
 
 1. Bert models with different settings  
 
-   These can be obtained by changing the optional arguments of  the 'get_model' function at line 312 in //utils//tftools//getmodel(), please refer to the [keras-bert](https://pypi.org/project/keras-bert/) for detailed settings for the bert model
+   The setting of bert model can be obtained by changing the optional arguments of  the 'get_model' function at line 320 in //utils//tftools//getmodel(), please refer to the [keras-bert](https://pypi.org/project/keras-bert/) for detailed settings for the bert model
 
 2. inference model
 
@@ -298,7 +302,7 @@ It is recommended to install the tool in a virtual environment, explained in [th
 
 1. Different settings of dlrm model
 
-   The setting of dlrm model can be adjusted by changing values of variables at line44-47 in  in //utils//pytools//modellst(). Please refer to [DLRM](https://github.com/facebookresearch/dlrm) for the details of these variables.
+   The setting of dlrm model can be adjusted by changing values of variables at line62-72 in  in //utils//pytools//modellst(). Please refer to [DLRM](https://github.com/facebookresearch/dlrm) for the details of these variables.
 
 
 
@@ -309,3 +313,4 @@ It is recommended to install the tool in a virtual environment, explained in [th
 - Codes for Pytorch model estimation were revised based on [torch-summary](https://github.com/TylerYep/torch-summary) @TylerYep
 - Keras version EfficientNet is originated from [EfficientNet](https://github.com/qubvel/efficientnet/tree/master/efficientnet) @qubvel  
 - DLRM is originated from [DLRM](https://github.com/facebookresearch/dlrm) by facebook
+- ML Perf models from [ML perf](https://github.com/mlperf) @mlperf
