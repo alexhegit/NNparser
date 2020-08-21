@@ -91,7 +91,7 @@ It is recommended to install the tool in a virtual environment, explained in [th
 
 4.  one stage detection: ssd_mobilenet, ssd_r34
 
-5. Others Models can also be imported, as long as a input tensor is provided  with the model. Please refer to **Section 4, example** **3** for details.
+5. Others Models can also be imported, as long as a input tensor is provided  with the model. Please refer to **Section 4** for details.
 
 ### 2.2. Tensorflow version: keras2table
 
