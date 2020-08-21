@@ -169,13 +169,13 @@ It is recommended to install the tool in a virtual environment, explained in [th
 
 ```
                                                             layer-l0		|	layer_l1	|	layer-l1
-       	├─Sequential: 1-5                                  Sequential:1-5	|				|
-        |    └─Bottleneck: 2-1                           			|Bottleneck:2-1	|
-        |    |    └─Conv2d: 3-1             ==>				     	|				|Conv2d: 3-1
-        |    |    └─BatchNorm2d: 3-2             					|				|BatchNorm2d: 3-2
-        |    |    └─ReLU: 3-3      									|				|ReLU: 3-3
+       	├─Sequential: 1-5                                  Sequential:1-5	|			|
+        |    └─Bottleneck: 2-1                           			| Bottleneck:2-1	|
+        |    |    └─Conv2d: 3-1             ==>				     	|		        | Conv2d: 3-1
+        |    |    └─BatchNorm2d: 3-2             			        |		        | BatchNorm2d: 3-2
+        |    |    └─ReLU: 3-3      						|		        | ReLU: 3-3
         
-        Pytoch Model Hierarchy												pytorch table
+        Pytoch Model Hierarchy								pytorch table
 ```
 
 ​		**Input tensors :**
